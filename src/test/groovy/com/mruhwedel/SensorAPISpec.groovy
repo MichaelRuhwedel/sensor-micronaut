@@ -9,13 +9,13 @@ import spock.lang.Specification
 
 import javax.inject.Inject
 
+import static com.mruhwedel.SensorTestData.ANY_UUID
 import static io.micronaut.http.HttpRequest.POST
 import static io.micronaut.http.HttpStatus.CREATED
 
 @MicronautTest
 class SensorAPISpec extends Specification {
 
-    static ANY_UUID = 'any-uuid'
 
     @Inject
     EmbeddedServer server;
@@ -26,7 +26,7 @@ class SensorAPISpec extends Specification {
 
     def 'status() returns'() {
         expect:
-         client.toBlocking().retrieve(ANY_UUID)
+        client.toBlocking().retrieve(ANY_UUID)
     }
 
 

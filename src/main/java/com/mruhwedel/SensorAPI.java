@@ -4,6 +4,8 @@ import io.micronaut.http.annotation.*;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.inject.Inject;
+
 import static io.micronaut.http.HttpStatus.CREATED;
 
 @Slf4j
@@ -11,11 +13,15 @@ import static io.micronaut.http.HttpStatus.CREATED;
 
 public class SensorAPI {
 
-    @Get // media-type defaults to application/json
+    @Inject
+    SensorService sensorService;
+
+    @Get // media-type defaults to application/json, null will be 404
     public StatusDto status(@QueryValue("uuid") String uuid) {
-        StatusDto statusDto = new StatusDto(SensorStatus.OK);
-        log.info("{}: {}", uuid, statusDto.getStatus());
-        return statusDto;
+        return sensorService
+                .readStatus(uuid)
+                .map(StatusDto::new)
+                .orElse(null);
     }
 
     @Post("/measurements")
@@ -24,8 +30,7 @@ public class SensorAPI {
             @QueryValue("uuid") String uuid,
             @Body Measurements measurements
     ) {
-        log.info("{}: {}@{}",
-                uuid, measurements.getTime(), measurements.getCo2());
+        sensorService.recordAndUpdateStatus(uuid, measurements);
     }
 
     @Value

@@ -45,6 +45,7 @@ class SensorAPISpec extends Specification {
                         "$ANY_UUID/measurements",
                         measurements
                 ))
+
         then:
         response.status() == CREATED
     }

@@ -5,7 +5,7 @@ import java.util.List;
 
 @Singleton
 public class StatusCalculator {
-    public SensorStatus calculateCurrentStatus(List<Measurements> measurementsList) {
+    public SensorStatus calculateCurrentStatus(Measurement measurement, List<Measurement> measurementList) {
         return SensorStatus.OK;
     }
 }

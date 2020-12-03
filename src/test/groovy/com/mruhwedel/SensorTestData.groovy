@@ -17,7 +17,7 @@ abstract class SensorTestData {
     static MEASUREMENT_LIMIT = create(CO_2_ALERT_THRESHOLD)
     static MEASUREMENT_CRITICAL = create(CO_2_CRITICAL)
 
-    private static Measurements create(int co2) {
-        return new Measurements(co2, SOME_TIME) // if you want sth. more realistic, use a unique timestamp here
+    private static Measurement create(int co2) {
+        return new Measurement(co2, SOME_TIME) // if you want sth. more realistic, use a unique timestamp here
     }
 }

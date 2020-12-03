@@ -9,7 +9,7 @@ import java.time.ZonedDateTime;
 @Data
 @NoArgsConstructor // used by micronaut
 @AllArgsConstructor // convenience
-class Measurements {
+class Measurement {
     private int co2;
     private ZonedDateTime time;
 }

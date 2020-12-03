@@ -28,9 +28,9 @@ public class SensorAPI {
     @Status(CREATED)
     public void measurements(
             @QueryValue("uuid") String uuid,
-            @Body Measurements measurements
+            @Body Measurement measurement
     ) {
-        sensorService.recordAndUpdateStatus(uuid, measurements);
+        sensorService.recordAndUpdateStatus(uuid, measurement);
     }
 
     @Value

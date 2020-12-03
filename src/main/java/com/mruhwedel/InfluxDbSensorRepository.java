@@ -20,13 +20,13 @@ public class InfluxDbSensorRepository implements SensorRepository {
     }
 
     @Override
-    public @NonNull List<Measurements> fetchThreePreviousMeasurements(@NonNull String uuid) {
+    public @NonNull List<Measurement> fetchTwoPreviousMeasurements(@NonNull String uuid) {
         log.info("fetching");
         return Collections.emptyList();
     }
 
     @Override
-    public void record(@NonNull String uuid, @NonNull Measurements measurements, @NonNull SensorStatus sensorStatus) {
+    public void record(@NonNull String uuid, @NonNull Measurement measurement, @NonNull SensorStatus sensorStatus) {
         log.info("recording");
     }
 }

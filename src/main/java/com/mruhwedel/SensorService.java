@@ -1,6 +1,5 @@
 package com.mruhwedel;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +8,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import static lombok.AccessLevel.PACKAGE;
@@ -35,10 +33,10 @@ public class SensorService {
         return sensorStatus;
     }
 
-    void recordAndUpdateStatus(@NonNull String uuid, @NonNull Measurements measurements) {
-        List<Measurements> measurementsList = sensorRepository.fetchThreePreviousMeasurements(uuid);
-        SensorStatus sensorStatus = statusCalculator.calculateCurrentStatus(measurementsList);
-        log.info("{}: {}@{}", uuid, sensorStatus, measurements.getTime());
-        sensorRepository.record(uuid, measurements, sensorStatus);
+    void recordAndUpdateStatus(@NonNull String uuid, @NonNull Measurement measurement) {
+        List<Measurement> measuremens = sensorRepository.fetchTwoPreviousMeasurements(uuid);
+        SensorStatus sensorStatus = statusCalculator.calculateCurrentStatus(measurement, measuremens);
+        log.info("{}: {}@{}", uuid, sensorStatus, measurement.getTime());
+        sensorRepository.record(uuid, measurement, sensorStatus);
     }
 }

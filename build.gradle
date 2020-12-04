@@ -34,7 +34,10 @@ dependencies {
 
     // my dependencies
     annotationProcessor "org.projectlombok:lombok:$VERSION_LOMBOK"
-    compileOnly("org.projectlombok:lombok:$VERSION_LOMBOK"){
+    compile 'com.google.guava:guava:28.0-jre'
+    compile "com.influxdb:influxdb-client-java:1.8.0"
+
+    compileOnly("org.projectlombok:lombok:$VERSION_LOMBOK") {
         because 'Syntactical sugar. See https://projectlombok.org/'
     }
 

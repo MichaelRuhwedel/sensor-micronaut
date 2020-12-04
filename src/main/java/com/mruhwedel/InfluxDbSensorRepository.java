@@ -49,7 +49,8 @@ public class InfluxDbSensorRepository implements SensorRepository {
     @NotNull
     private String createQuery(String uuid, int limit) {
         return String.format(
-                "data \n" +
+                "from(bucket: \"sensor_measurements\")" +
+                        "  |> range(start: -1h) \n" +
                         "  |> sort(columns: [\"_time\"]) \n" +
                         "  |> filter(fn: (r) => r.uuid == %s) \n" +
                         "  |> limit(n: %d)",

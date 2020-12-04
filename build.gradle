@@ -53,12 +53,16 @@ java {
     targetCompatibility = JavaVersion.toVersion("11")
 }
 
-task influxDbStart(type:Exec){
+task influxDbStart(type: Exec) {
     commandLine 'docker', 'run',
-                    '--name', 'influxdb',
-                    '--rm',
-                    '-p', '8086',
-                    'influxdb:1.8-alpine'
+            '--name', 'influxdb',
+            '--rm',
+            '-e', 'INFLUXDB_DATA_QUERY_LOG_ENABLED=true', // debugging
+            '-e', 'INFLUXDB_DB=sensor_measurements', // will bootstrap a db
+            '-e', 'INFLUXDB_HTTP_FLUX_ENABLED=true', // needed for the queries we use
+            '-p', '8086:8086',
+            '-v', 'influxdb:/var/lib/influxdb',
+            'influxdb:1.8-alpine'
 }
 
 tasks {

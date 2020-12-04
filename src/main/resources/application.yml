@@ -6,4 +6,4 @@ influxdb:
   token: 'dev-token'
   org:   'dev-org'
   url:  'http://localhost:8086'
-  bucket: measurements
+  bucket: sensor_measurements

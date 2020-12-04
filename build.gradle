@@ -24,6 +24,7 @@ micronaut {
 ext {
     VERSION_LOMBOK = '1.18.16'
 }
+
 dependencies {
     // micronaut dependencies
     implementation("io.micronaut:micronaut-validation")
@@ -36,7 +37,6 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok:$VERSION_LOMBOK"
     compile 'com.google.guava:guava:28.0-jre'
     compile "com.influxdb:influxdb-client-java:1.14.0"
-
     compileOnly("org.projectlombok:lombok:$VERSION_LOMBOK") {
         because 'Syntactical sugar. See https://projectlombok.org/'
     }
@@ -53,8 +53,14 @@ java {
     targetCompatibility = JavaVersion.toVersion("11")
 }
 
+task influxDbStart(type:Exec){
+    commandLine 'docker', 'run',
+                    '--name', 'influxdb',
+                    '--rm',
+                    '-p', '8086',
+                    'influxdb:1.8-alpine'
+}
+
 tasks {
-
-
 }
 

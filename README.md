@@ -1,6 +1,8 @@
-## Feature http-client documentation
+## sensor-micronaut
 
-- [Micronaut Micronaut HTTP Client documentation](https://docs.micronaut.io/latest/guide/index.html#httpClient)
+## Development Setup
 
-# sensor-micronaut
-# sensor-micronaut
+### Run the local DB
+```
+ ./gradlew influxdbStart
+```

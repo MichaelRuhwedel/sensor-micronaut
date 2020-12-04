@@ -1,3 +1,9 @@
 micronaut:
   application:
     name: sensor
+
+influxdb:
+  token: 'dev-token'
+  org:   'dev-org'
+  url:  'http://localhost:8086'
+  bucket: measurements

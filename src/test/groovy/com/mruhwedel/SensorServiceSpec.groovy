@@ -4,9 +4,7 @@ import spock.lang.Specification
 
 import static com.mruhwedel.SensorStatus.OK
 import static com.mruhwedel.SensorTestData.ANY_UUID
-import static com.mruhwedel.SensorTestData.MEASUREMENT_OK
-import static com.mruhwedel.SensorTestData.MEASUREMENT_OK
-import static com.mruhwedel.SensorTestData.MEASUREMENT_OK
+import static com.mruhwedel.SensorTestData.MEASUREMENT_BELOW_THRESHOLD
 
 class SensorServiceSpec extends Specification {
 
@@ -29,17 +27,17 @@ class SensorServiceSpec extends Specification {
 
     def "recordAndUpdateStatus() will record the measurement and the correct status"() {
         given:
-        def currentMeasurement = MEASUREMENT_OK
-        def currentStatus = OK
+        def currentMeasurement = MEASUREMENT_BELOW_THRESHOLD
+        def currentStatus = new QualifiedMeasurement(currentMeasurement, OK)
         def previousMeasurements = []
 
         when:
-        service.recordAndUpdateStatus(ANY_UUID, MEASUREMENT_OK)
+        service.recordAndUpdateStatus(ANY_UUID, currentMeasurement)
 
         then:
         1 * service.sensorRepository.fetchTwoPreviousMeasurements(ANY_UUID) >> previousMeasurements
         1 * service.statusCalculator.calculateCurrentStatus(currentMeasurement, previousMeasurements) >> currentStatus
-        1 * service.sensorRepository.record(ANY_UUID, currentMeasurement, currentStatus)
+        1 * service.sensorRepository.record(ANY_UUID, currentStatus)
 
     }
 }

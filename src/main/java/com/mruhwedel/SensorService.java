@@ -34,9 +34,9 @@ public class SensorService {
     }
 
     void recordAndUpdateStatus(@NonNull String uuid, @NonNull Measurement measurement) {
-        List<Measurement> measuremens = sensorRepository.fetchTwoPreviousMeasurements(uuid);
-        SensorStatus sensorStatus = statusCalculator.calculateCurrentStatus(measurement, measuremens);
-        log.info("{}: {}@{}", uuid, sensorStatus, measurement.getTime());
-        sensorRepository.record(uuid, measurement, sensorStatus);
+        List<QualifiedMeasurement> measurements = sensorRepository.fetchTwoPreviousMeasurements(uuid);
+        QualifiedMeasurement qualifiedMeasurement = statusCalculator.calculateCurrentStatus(measurement, measurements);
+        log.info("{}: {}@{}", uuid, qualifiedMeasurement.getSensorStatus(), measurement.getTime());
+        sensorRepository.record(uuid, qualifiedMeasurement);
     }
 }

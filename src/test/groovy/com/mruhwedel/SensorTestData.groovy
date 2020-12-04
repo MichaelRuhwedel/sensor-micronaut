@@ -13,9 +13,9 @@ abstract class SensorTestData {
     private static final int CO_2_CRITICAL = CO_2_ALERT_THRESHOLD + 1
     private static final ZonedDateTime SOME_TIME = now()
 
-    static MEASUREMENT_OK = create(CO_2_OK)
-    static MEASUREMENT_LIMIT = create(CO_2_ALERT_THRESHOLD)
-    static MEASUREMENT_CRITICAL = create(CO_2_CRITICAL)
+    static MEASUREMENT_BELOW_THRESHOLD = create(CO_2_OK)
+    static MEASUREMENT_AT_THRESHOLD = create(CO_2_ALERT_THRESHOLD)
+    static MEASUREMENT_ABOVE_THRESHOLD = create(CO_2_CRITICAL)
 
     private static Measurement create(int co2) {
         return new Measurement(co2, SOME_TIME) // if you want sth. more realistic, use a unique timestamp here

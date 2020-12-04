@@ -10,7 +10,7 @@ public interface SensorRepository {
     Optional<SensorStatus> readStatus(@NonNull String uuid);
 
     @NonNull
-    List<Measurement> fetchTwoPreviousMeasurements(@NonNull String uuid);
+    List<QualifiedMeasurement> fetchTwoPreviousMeasurements(@NonNull String uuid);
 
-    void record(@NonNull String uuid, @NonNull Measurement measurement, @NonNull SensorStatus sensorStatus);
+    void record(@NonNull String uuid, @NonNull QualifiedMeasurement measurement);
 }

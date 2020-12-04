@@ -1,11 +1,6 @@
 package com.mruhwedel;
 
-import com.google.common.base.Strings;
-import com.google.common.escape.Escaper;
-import com.google.common.escape.Escapers;
-import com.influxdb.annotations.Column;
 import com.influxdb.client.InfluxDBClient;
-import com.influxdb.client.domain.Query;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
 import lombok.NonNull;
@@ -13,19 +8,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.influxdb.client.domain.WritePrecision.S;
-import static com.mruhwedel.SensorStatus.OK;
 
 @Slf4j
 @Singleton

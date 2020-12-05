@@ -39,11 +39,9 @@ public class StatusCalculator {
 
     @NonNull
     private SensorStatus getPreviousStatus(List<QualifiedMeasurement> measurementList) {
-        return measurementList.isEmpty() ?
-                OK :
-                measurementList // get last, assuming the measurements are sorted by time
-                        .get(measurementList.size() - 1)
-                        .getSensorStatus();
+        return measurementList.stream().findFirst()
+                .map(QualifiedMeasurement::getSensorStatus)
+                .orElseThrow();
     }
 
     private int countAboveThreshold(List<QualifiedMeasurement> measurementList) {

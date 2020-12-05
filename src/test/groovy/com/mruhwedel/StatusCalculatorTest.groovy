@@ -5,6 +5,7 @@ import spock.lang.Unroll
 
 import static com.mruhwedel.SensorStatus.*
 import static com.mruhwedel.SensorTestData.*
+import static com.mruhwedel.SensorTestData.MEASUREMENT_BELOW_THRESHOLD
 
 class StatusCalculatorTest extends Specification {
 
@@ -20,27 +21,28 @@ class StatusCalculatorTest extends Specification {
         calculator.calculateCurrentStatus(current, previous) == new QualifiedMeasurement(current, expected)
 
         where:
-        previous          | current                     || expected
-        []                | MEASUREMENT_BELOW_THRESHOLD || OK
-        []                | MEASUREMENT_AT_THRESHOLD    || OK
-        []                | MEASUREMENT_ABOVE_THRESHOLD || WARN
+        previous            | current                     || expected
+        []                  | MEASUREMENT_BELOW_THRESHOLD || OK
+        []                  | MEASUREMENT_AT_THRESHOLD    || OK
+        []                  | MEASUREMENT_ABOVE_THRESHOLD || WARN
 
-        [QM_OK]           | MEASUREMENT_AT_THRESHOLD    || OK
-        [QM_OK]           | MEASUREMENT_ABOVE_THRESHOLD || WARN
-
-
-        [QM_ALERT]        | MEASUREMENT_BELOW_THRESHOLD || ALERT
-        [QM_ALERT] * 2    | MEASUREMENT_BELOW_THRESHOLD || ALERT
-        [QM_ALERT, QM_OK] | MEASUREMENT_BELOW_THRESHOLD || OK
-        [QM_OK] * 2       | MEASUREMENT_BELOW_THRESHOLD || OK
+        [QM_OK]             | MEASUREMENT_AT_THRESHOLD    || OK
+        [QM_OK]             | MEASUREMENT_ABOVE_THRESHOLD || WARN
 
 
-        [QM_OK, QM_WARN]  | MEASUREMENT_ABOVE_THRESHOLD || WARN
+        [QM_ALERT]          | MEASUREMENT_BELOW_THRESHOLD || ALERT
+        [QM_ALERT] * 2      | MEASUREMENT_BELOW_THRESHOLD || ALERT
+        [QM_OK, QM_ALERT]   | MEASUREMENT_BELOW_THRESHOLD || OK
+        [QM_OK] * 2         | MEASUREMENT_BELOW_THRESHOLD || OK
 
-        [QM_WARN]         | MEASUREMENT_ABOVE_THRESHOLD || WARN
 
-        [QM_WARN] * 2     | MEASUREMENT_ABOVE_THRESHOLD || ALERT
-        [QM_WARN, QM_OK]  | MEASUREMENT_ABOVE_THRESHOLD || WARN
+        [QM_OK, QM_WARN]    | MEASUREMENT_ABOVE_THRESHOLD || WARN
+
+        [QM_WARN]           | MEASUREMENT_ABOVE_THRESHOLD || WARN
+        [QM_ALERT, QM_WARN] | MEASUREMENT_BELOW_THRESHOLD || ALERT
+
+        [QM_WARN] * 2       | MEASUREMENT_ABOVE_THRESHOLD || ALERT
+        [QM_OK, QM_WARN]    | MEASUREMENT_ABOVE_THRESHOLD || WARN
 
     }
 }

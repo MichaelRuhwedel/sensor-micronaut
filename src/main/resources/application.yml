@@ -3,7 +3,9 @@ micronaut:
     name: sensor
 
 influxdb:
-  token: 'dev-token'
-  org:   'dev-org'
+  username: 'dev'
+  password:   'dev'
   url:  'http://localhost:8086'
-  bucket: sensor_measurements
+
+  # created by INFLUXDB_DB in build.gradle
+  database: sensors

@@ -10,8 +10,13 @@ import static com.mruhwedel.SensorStatus.*;
 @Singleton
 public class StatusCalculator {
 
-    private static final int ALERT_THRESHOLD_CONSECUTIVE_WARN = 2;
+    /**
+     * CO2 Levels between 2000 and 5000 ppm are associated with headaches, sleepiness
+     * poor concentration, loss of attention, increased heart rate and slight nausea
+     * may also be present
+     */
     private static final int CO_PPM_WARN_THRESHOLD = 2000;
+    private static final int ALERT_THRESHOLD_CONSECUTIVE_WARN = 2;
 
     @NonNull
     public QualifiedMeasurement calculateCurrentStatus(

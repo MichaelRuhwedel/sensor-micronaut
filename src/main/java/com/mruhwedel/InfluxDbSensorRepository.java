@@ -66,7 +66,9 @@ public class InfluxDbSensorRepository implements SensorRepository {
                                 measurement.getCo2Level(),
                                 ZonedDateTime.ofInstant(measurement.getTime(), ZoneId.of("UTC"))
                         ),
-                        SensorStatus.valueOf(measurement.getStatus())
+                        Optional.ofNullable(measurement.getStatus())
+                        .map(SensorStatus::valueOf)
+                        .orElse(null)
                 ))
                 .collect(Collectors.toList());
         log.info("{}: {} of up to {} measurements in repository",
@@ -90,12 +92,13 @@ public class InfluxDbSensorRepository implements SensorRepository {
     @Override
     public Optional<SensorMetrics> readMetrics(@NonNull String uuid) {
         Query query = newQuery(
-                "SELECT MEAN('co2_level'), MAX('co2_level') " +
+                "SELECT MEAN(\"co2_level\"), MAX(\"co2_level\") " +
                         "FROM co2_ppa " +
-                        "WHERE uuid = $uuid AND time > now() - 30d)"
+                        "WHERE uuid = $uuid AND time > now() - 30d"
         )
                 .bind("uuid", uuid)
                 .create();
+        log.info("{}", query.getCommand());
 
         return influxDB.query(query, MetricsCO2.class).stream()
                 .findFirst()

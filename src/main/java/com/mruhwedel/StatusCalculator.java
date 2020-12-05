@@ -46,7 +46,7 @@ public class StatusCalculator {
     private SensorStatus getPreviousStatus(List<QualifiedMeasurement> measurementList) {
         return measurementList.stream().findFirst()
                 .map(QualifiedMeasurement::getSensorStatus)
-                .orElseThrow();
+                .orElse(OK);
     }
 
     private int countAboveThreshold(List<QualifiedMeasurement> measurementList) {

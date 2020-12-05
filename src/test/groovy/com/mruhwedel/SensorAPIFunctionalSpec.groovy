@@ -17,6 +17,7 @@ import java.time.ZonedDateTime
 import static com.mruhwedel.SensorTestData.*
 import static io.micronaut.http.HttpRequest.POST
 import static io.micronaut.http.HttpStatus.NOT_FOUND
+import static java.util.stream.Collectors.toList
 
 @MicronautTest(environments = ['functional-test'])
 class SensorAPIFunctionalSpec extends Specification {
@@ -141,37 +142,60 @@ class SensorAPIFunctionalSpec extends Specification {
     // Sensor Metrics
     def 'Metrics: 404-Not Found: when nothing is recorded'() {
         when:
-        client.toBlocking().exchange("$ANY_UUID/metrics")
+        readMetrics(ANY_UUID)
 
         then:
         def e = thrown HttpClientResponseException
         e.status == NOT_FOUND
     }
 
+    private SensorMetrics readMetrics(uuid) {
+        client.toBlocking()
+                .exchange("$uuid/metrics", SensorMetrics)
+                .body()
+    }
+
     def 'will return the maximum & average of the last 30 days'() {
         given:
-        def random = new Random(123)
-        def beginningOfPeriodToAverage = ZonedDateTime.now().minusDays(30)
+        def measurements = generateRandomMeasurementsForA30DayWindow()
+        def expected = new SensorMetrics(
+                measurements.stream().mapToInt(Measurement::getCo2).max().orElse(0),
+                measurements.stream().mapToInt(Measurement::getCo2).average().orElse(0d)
+        )
 
-        when: 'collect 30 days worth of measurements'
-        (0..(Duration.ofDays(30).toMinutes()))
-                .each {
-                    collectMeasurement(
-                            createMeasurement(
-                                    random.nextInt(),
-                                    beginningOfPeriodToAverage.plusMinutes(it)
-                            )
-                    )
-                }
+        when: 'all the samples have collected by the API '
+        measurements.forEach(this::collectMeasurement)
+
+        and: 'the metrics are read'
+        def metrics = readMetrics(ANY_UUID)
 
         then:
-        true
+        metrics == expected
 
     }
 
+    private static List<Measurement> generateRandomMeasurementsForA30DayWindow() {
+        def sampleSize = 100
+        def averagingWindow = Duration.ofDays(30)
 
-    private HttpResponse<Object> collectMeasurement(Measurement threshold) {
-        client.toBlocking().exchange(POST("$ANY_UUID/measurements", threshold))
+        def beginningOfPeriodToAverage = ZonedDateTime.now().minusDays(averagingWindow.toDays())
+        def random = new Random(123)
+        (0..sampleSize).stream()
+                .map(ignored -> {
+                    def randomCo2Level = Math.abs(random.nextInt(8000))
+                    def randomMinutes = Math.abs(random.nextInt(averagingWindow.toMinutes().intValue()))
+                    createMeasurement(
+                            randomCo2Level,
+                            beginningOfPeriodToAverage.plusMinutes(randomMinutes)
+                    )
+                }
+                )
+                .collect(toList())
+    }
+
+    private HttpResponse<Object> collectMeasurement(Measurement measurements) {
+        client.toBlocking()
+                .exchange(POST("$ANY_UUID/measurements", measurements))
     }
 
     String getStatus() {

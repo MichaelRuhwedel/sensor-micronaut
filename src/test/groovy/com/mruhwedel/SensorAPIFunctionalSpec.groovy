@@ -1,7 +1,6 @@
 package com.mruhwedel
 
 import com.mruhwedel.InfluxDbFactory.DatabaseConfig
-import groovy.json.JsonSlurper
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
@@ -14,7 +13,6 @@ import spock.lang.Specification
 import javax.inject.Inject
 import java.time.Duration
 import java.time.ZonedDateTime
-import java.util.concurrent.TimeUnit
 
 import static com.mruhwedel.SensorTestData.*
 import static io.micronaut.http.HttpRequest.POST
@@ -177,9 +175,10 @@ class SensorAPIFunctionalSpec extends Specification {
     }
 
     String getStatus() {
-        SLURPER
-                .parseText(client.toBlocking().retrieve(ANY_UUID))
-                .status // status field of the json body
+        client.toBlocking()
+                .exchange(ANY_UUID, SensorAPI.StatusDto)
+                .body()
+                .status
     }
 
     private void wipeDatabase() {
@@ -192,7 +191,5 @@ class SensorAPIFunctionalSpec extends Specification {
                 )
         )
     }
-
-    static final JsonSlurper SLURPER = new JsonSlurper()
 
 }

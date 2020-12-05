@@ -1,8 +1,7 @@
 package com.mruhwedel;
 
 import io.micronaut.http.annotation.*;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
@@ -41,8 +40,11 @@ public class SensorAPI {
         sensorService.recordAndUpdateStatus(uuid, measurement);
     }
 
-    @Value
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     static class StatusDto {
-        SensorStatus status;
+        private SensorStatus status;
     }
 }

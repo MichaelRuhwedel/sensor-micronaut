@@ -41,7 +41,6 @@ dependencies {
         because 'client for the influxDb'
     }
 
-    testImplementation"org.codehaus.groovy:groovy-json:$VERSION_GROOVY"
     testImplementation"org.codehaus.groovy:groovy:$VERSION_GROOVY"
 
     compileOnly("org.projectlombok:lombok:$VERSION_LOMBOK") {

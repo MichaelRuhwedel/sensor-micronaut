@@ -16,18 +16,18 @@ abstract class SensorTestData {
     private static final ZonedDateTime SOME_TIME = now()
 
     static MEASUREMENT_BELOW_THRESHOLD = createBelowThreshold()
-    static MEASUREMENT_AT_THRESHOLD = create(CO_2_THRESHOLD)
+    static MEASUREMENT_AT_THRESHOLD = createMeasurement(CO_2_THRESHOLD)
     static MEASUREMENT_ABOVE_THRESHOLD = createAboveThreshold()
 
     static createBelowThreshold(ZonedDateTime time = SOME_TIME) {
-        create(CO_2_BELOW_THRESHOLD, time)
+        createMeasurement(CO_2_BELOW_THRESHOLD, time)
     }
 
     static createAboveThreshold(ZonedDateTime time = SOME_TIME) {
-        create(CO_2_ABOVE_THRESHOLD, time)
+        createMeasurement(CO_2_ABOVE_THRESHOLD, time)
     }
 
-    private static Measurement create(int co2, ZonedDateTime time = SOME_TIME) {
+    static Measurement createMeasurement(int co2, ZonedDateTime time = SOME_TIME) {
         new Measurement(co2, time)
     }
 }

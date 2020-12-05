@@ -33,6 +33,20 @@ public class SensorService {
         return sensorStatus;
     }
 
+    @NonNull
+    Optional<SensorMetrics> readMetrics(@NonNull String uuid) {
+        Optional<SensorMetrics> metrics = sensorRepository.readMetrics(uuid);
+        log.info("{}:  {}", uuid, metrics.map(this::formatMetrics).orElse("UNKNOWN"));
+        return metrics;
+    }
+
+    private String formatMetrics(SensorMetrics m) {
+        return String.format("%1$4s - %2$4s",
+                m.getMaxLast30Days(),
+                m.getMaxLast30Days()
+        );
+    }
+
     void recordAndUpdateStatus(@NonNull String uuid, @NonNull Measurement measurement) {
         List<QualifiedMeasurement> measurements = sensorRepository.fetchTwoPreviousMeasurements(uuid);
         QualifiedMeasurement qualifiedMeasurement = statusCalculator.calculateCurrentStatus(measurement, measurements);

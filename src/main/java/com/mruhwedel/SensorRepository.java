@@ -13,4 +13,6 @@ public interface SensorRepository {
     List<QualifiedMeasurement> fetchTwoPreviousMeasurements(@NonNull String uuid);
 
     void record(@NonNull String uuid, @NonNull QualifiedMeasurement measurement);
+
+    Optional<SensorMetrics> readMetrics(String uuid);
 }

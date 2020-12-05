@@ -1,10 +1,13 @@
 package com.mruhwedel;
 
 import io.micronaut.http.annotation.*;
+import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
+
+import java.util.Optional;
 
 import static io.micronaut.http.HttpStatus.CREATED;
 
@@ -24,6 +27,11 @@ public class SensorAPI {
                 .orElse(null);
     }
 
+    @Get("/metrics") // media-type defaults to application/json, null will be 404
+    public @NonNull Optional<SensorMetrics> metrics(@QueryValue("uuid") String uuid) {
+        return sensorService.readMetrics(uuid);
+    }
+
     @Post("/measurements")
     @Status(CREATED)
     public void measurements(
@@ -34,7 +42,7 @@ public class SensorAPI {
     }
 
     @Value
-    private static class StatusDto {
+    static class StatusDto {
         SensorStatus status;
     }
 }

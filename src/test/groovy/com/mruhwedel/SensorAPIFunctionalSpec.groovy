@@ -12,7 +12,9 @@ import org.influxdb.dto.Query
 import spock.lang.Specification
 
 import javax.inject.Inject
+import java.time.Duration
 import java.time.ZonedDateTime
+import java.util.concurrent.TimeUnit
 
 import static com.mruhwedel.SensorTestData.*
 import static io.micronaut.http.HttpRequest.POST
@@ -35,6 +37,7 @@ class SensorAPIFunctionalSpec extends Specification {
         wipeDatabase()
     }
 
+    // Status & Collecting sensor measurements
     def '404-Not Found: when nothing is recorded'() {
         when:
         client.toBlocking().exchange(ANY_UUID)
@@ -46,7 +49,7 @@ class SensorAPIFunctionalSpec extends Specification {
 
     def 'OK: after a measurement below threshold is recorded'() {
         when:
-        postMeasurement(createBelowThreshold())
+        collectMeasurement(createBelowThreshold())
 
         then:
         status == 'OK'
@@ -54,7 +57,7 @@ class SensorAPIFunctionalSpec extends Specification {
 
     def 'WARN: after a measurement above is recorded'() {
         when:
-        postMeasurement(createAboveThreshold())
+        collectMeasurement(createAboveThreshold())
 
         then:
         status == 'WARN'
@@ -65,8 +68,8 @@ class SensorAPIFunctionalSpec extends Specification {
         def now = ZonedDateTime.now()
 
         when:
-        postMeasurement(createAboveThreshold(now))
-        postMeasurement(createAboveThreshold(now.plusMinutes(1)))
+        collectMeasurement(createAboveThreshold(now))
+        collectMeasurement(createAboveThreshold(now.plusMinutes(1)))
 
         then:
         status == 'WARN'
@@ -77,9 +80,9 @@ class SensorAPIFunctionalSpec extends Specification {
         def now = ZonedDateTime.now()
 
         when:
-        postMeasurement(createAboveThreshold(now))
-        postMeasurement(createAboveThreshold(now.plusMinutes(1)))
-        postMeasurement(createAboveThreshold(now.plusMinutes(2)))
+        collectMeasurement(createAboveThreshold(now))
+        collectMeasurement(createAboveThreshold(now.plusMinutes(1)))
+        collectMeasurement(createAboveThreshold(now.plusMinutes(2)))
 
         then:
         status == 'ALERT'
@@ -90,12 +93,12 @@ class SensorAPIFunctionalSpec extends Specification {
         def now = ZonedDateTime.now()
 
         when: 'an alert is triggered'
-        postMeasurement(createAboveThreshold(now))
-        postMeasurement(createAboveThreshold(now.plusMinutes(1)))
-        postMeasurement(createAboveThreshold(now.plusMinutes(2)))
+        collectMeasurement(createAboveThreshold(now))
+        collectMeasurement(createAboveThreshold(now.plusMinutes(1)))
+        collectMeasurement(createAboveThreshold(now.plusMinutes(2)))
 
         and: 'measurement is back to normal'
-        postMeasurement(createBelowThreshold(now.plusMinutes(3)))
+        collectMeasurement(createBelowThreshold(now.plusMinutes(3)))
 
         then:
         status == 'ALERT'
@@ -106,13 +109,13 @@ class SensorAPIFunctionalSpec extends Specification {
         def now = ZonedDateTime.now()
 
         when: 'an alert is triggered'
-        postMeasurement(createAboveThreshold(now))
-        postMeasurement(createAboveThreshold(now.plusMinutes(1)))
-        postMeasurement(createAboveThreshold(now.plusMinutes(2)))
+        collectMeasurement(createAboveThreshold(now))
+        collectMeasurement(createAboveThreshold(now.plusMinutes(1)))
+        collectMeasurement(createAboveThreshold(now.plusMinutes(2)))
 
         and: 'measurement is back to normal'
-        postMeasurement(createBelowThreshold(now.plusMinutes(3)))
-        postMeasurement(createBelowThreshold(now.plusMinutes(4)))
+        collectMeasurement(createBelowThreshold(now.plusMinutes(3)))
+        collectMeasurement(createBelowThreshold(now.plusMinutes(4)))
 
         then:
         status == 'ALERT'
@@ -123,20 +126,53 @@ class SensorAPIFunctionalSpec extends Specification {
         def now = ZonedDateTime.now()
 
         when: 'an alert is triggered'
-        postMeasurement(createAboveThreshold(now))
-        postMeasurement(createAboveThreshold(now.plusMinutes(1)))
-        postMeasurement(createAboveThreshold(now.plusMinutes(2)))
+        collectMeasurement(createAboveThreshold(now))
+        collectMeasurement(createAboveThreshold(now.plusMinutes(1)))
+        collectMeasurement(createAboveThreshold(now.plusMinutes(2)))
 
         and: 'measurement is back to normal'
-        postMeasurement(createBelowThreshold(now.plusMinutes(3)))
-        postMeasurement(createBelowThreshold(now.plusMinutes(4)))
-        postMeasurement(createBelowThreshold(now.plusMinutes(5)))
+        collectMeasurement(createBelowThreshold(now.plusMinutes(3)))
+        collectMeasurement(createBelowThreshold(now.plusMinutes(4)))
+        collectMeasurement(createBelowThreshold(now.plusMinutes(5)))
 
         then:
         status == 'OK'
     }
+    //END: Status & Collecting sensor measurements
 
-    private HttpResponse<Object> postMeasurement(Measurement threshold) {
+    // Sensor Metrics
+    def 'Metrics: 404-Not Found: when nothing is recorded'() {
+        when:
+        client.toBlocking().exchange("$ANY_UUID/metrics")
+
+        then:
+        def e = thrown HttpClientResponseException
+        e.status == NOT_FOUND
+    }
+
+    def 'will return the maximum & average of the last 30 days'() {
+        given:
+        def random = new Random(123)
+        def beginningOfPeriodToAverage = ZonedDateTime.now().minusDays(30)
+
+        when: 'collect 30 days worth of measurements'
+        (0..(Duration.ofDays(30).toMinutes()))
+                .each {
+                    collectMeasurement(
+                            createMeasurement(
+                                    random.nextInt(),
+                                    beginningOfPeriodToAverage.plusMinutes(it)
+                            )
+                    )
+                }
+
+        then:
+        true
+
+    }
+
+
+    private HttpResponse<Object> collectMeasurement(Measurement threshold) {
         client.toBlocking().exchange(POST("$ANY_UUID/measurements", threshold))
     }
 

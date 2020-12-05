@@ -3,6 +3,7 @@ package com.mruhwedel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.influxdb.dto.BoundParameterQuery;
 import org.influxdb.dto.Query;
 import org.influxdb.impl.InfluxDBMapper;
 import org.jetbrains.annotations.NotNull;
@@ -13,8 +14,9 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static org.influxdb.dto.BoundParameterQuery.QueryBuilder.newQuery;
 
 @Slf4j
 @Singleton
@@ -40,19 +42,19 @@ public class InfluxDbSensorRepository implements SensorRepository {
 
     @NotNull
     private Query createQuery(String uuid, int limit) {
-        return new Query(String.format(
+        return newQuery(
                 "select * from co2_ppa " +
-                        "where uuid='%s' " +
+                        "where uuid=$uuid " +
                         "order by time desc " +
-                        "limit %d ",
-                uuid, limit
-        ));
+                        "limit $limit")
+                .bind("uuid", uuid)
+                .bind("limit", limit)
+                .create();
     }
 
     @Override
     public @NonNull List<QualifiedMeasurement> fetchTwoPreviousMeasurements(@NonNull String uuid) {
         Query query = createQuery(uuid, LIMIT_PREVIOUS);
-
         List<QualifiedMeasurement> results = influxDB.query(query, MeasurementCO2.class)
                 .stream()
                 .filter(Objects::nonNull)
@@ -83,7 +85,23 @@ public class InfluxDbSensorRepository implements SensorRepository {
         );
 
         influxDB.save(measurementCO2);
-
     }
 
+    @Override
+    public Optional<SensorMetrics> readMetrics(@NonNull String uuid) {
+        Query query = newQuery(
+                "SELECT MEAN('co2_level'), MAX('co2_level') " +
+                        "FROM co2_ppa " +
+                        "WHERE uuid = $uuid AND time > now() - 30d)"
+        )
+                .bind("uuid", uuid)
+                .create();
+
+        return influxDB.query(query, MetricsCO2.class).stream()
+                .findFirst()
+                .map(it -> new SensorMetrics(
+                        it.getMax(),
+                        it.getMean())
+                );
+    }
 }

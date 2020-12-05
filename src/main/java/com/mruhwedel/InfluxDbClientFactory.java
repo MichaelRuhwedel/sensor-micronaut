@@ -1,9 +1,10 @@
 package com.mruhwedel;
 
-import com.influxdb.client.InfluxDBClient;
-import com.influxdb.client.InfluxDBClientFactory;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Value;
+import org.influxdb.InfluxDB;
+import org.influxdb.InfluxDBFactory;
+import org.influxdb.impl.InfluxDBMapper;
 
 import javax.inject.Singleton;
 
@@ -13,17 +14,23 @@ public class InfluxDbClientFactory {
     @Value("${influxdb.url}")
     private String influxUrl;
 
-    @Value("${influxdb.org}")
-    private String org;
+    @Value("${influxdb.username}")
+    private String username;
 
-    @Value("${influxdb.token}")
-    private char[] token;
+    @Value("${influxdb.password}")
+    private String password;
 
-    @Value("${influxdb.bucket}")
-    private String bucket;
+    @Value("${influxdb.database}")
+    private String database;
 
     @Singleton
-    InfluxDBClient influxDBClient(){
-        return InfluxDBClientFactory.create(influxUrl, token, org, bucket);
+    InfluxDBMapper influxDBClient() {
+        return new InfluxDBMapper(createDb());
+    }
+
+    private InfluxDB createDb() {
+        return InfluxDBFactory
+                .connect(influxUrl, username, password)
+                .setDatabase(database);
     }
 }

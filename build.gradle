@@ -36,7 +36,7 @@ dependencies {
     // my dependencies
     annotationProcessor "org.projectlombok:lombok:$VERSION_LOMBOK"
     compile 'com.google.guava:guava:28.0-jre'
-    compile "com.influxdb:influxdb-client-java:1.14.0"
+    compile "org.influxdb:influxdb-java:2.21"
     compileOnly("org.projectlombok:lombok:$VERSION_LOMBOK") {
         because 'Syntactical sugar. See https://projectlombok.org/'
     }
@@ -58,7 +58,7 @@ task influxDbStart(type: Exec) {
             '--name', 'influxdb',
             '--rm',
             '-e', 'INFLUXDB_DATA_QUERY_LOG_ENABLED=true', // debugging
-            '-e', 'INFLUXDB_DB=sensor_measurements', // will bootstrap a db
+            '-e', 'INFLUXDB_DB=sensors', // will bootstrap a db
             '-e', 'INFLUXDB_HTTP_FLUX_ENABLED=true', // needed for the queries we use
             '-p', '8086:8086',
             '-v', 'influxdb:/var/lib/influxdb',

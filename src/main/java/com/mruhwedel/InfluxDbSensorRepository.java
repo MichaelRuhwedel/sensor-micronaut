@@ -1,101 +1,88 @@
 package com.mruhwedel;
 
-import com.influxdb.client.InfluxDBClient;
-import com.influxdb.client.domain.WritePrecision;
-import com.influxdb.client.write.Point;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.influxdb.dto.Query;
+import org.influxdb.impl.InfluxDBMapper;
 import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Singleton;
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import static com.influxdb.client.domain.WritePrecision.S;
 
 @Slf4j
 @Singleton
 @RequiredArgsConstructor // if there's only one, it'll be used for injection
 public class InfluxDbSensorRepository implements SensorRepository {
 
-    private static final WritePrecision WRITE_PRECISION = S; // the specs say that's all we need
-    public static final String MEASUREMENT_NAME = "co2";
     public static final int LIMIT_PREVIOUS = 2;
 
     @SuppressWarnings("unused") // @injected
-    private final InfluxDBClient influxDBClient;
+    private final InfluxDBMapper influxDB;
 
     @Override
     public Optional<SensorStatus> readStatus(@NonNull String uuid) {
-        String query = createQuery(uuid, 1);
+        Query query = createQuery(uuid, 1);
 
-        Optional<SensorStatus> status = influxDBClient.getQueryApi()
-                .query(query).stream()
-                .flatMap(t -> t.getRecords().stream())
+        return influxDB
+                .query(query, MeasurementCO2.class)
+                .stream()
                 .findFirst()
-                .map(fr -> (String) fr.getValueByKey("status"))
+                .map(MeasurementCO2::getStatus)
                 .map(SensorStatus::valueOf);
-
-        log.info("Read {}", status);
-        return status;
     }
 
     @NotNull
-    private String createQuery(String uuid, int limit) {
-        return String.format(
-                "from(bucket: \"sensor_measurements\")" +
-                        "  |> range(start: -1h) \n" +
-                        "  |> sort(columns: [\"_time\"]) \n" +
-                        "  |> filter(fn: (r) => r.uuid == %s) \n" +
-                        "  |> limit(n: %d)",
+    private Query createQuery(String uuid, int limit) {
+        return new Query(String.format(
+                "select * from co2_ppa " +
+                        "where uuid='%s' " +
+                        "order by time desc " +
+                        "limit %d ",
                 uuid, limit
-        );
+        ));
     }
 
     @Override
     public @NonNull List<QualifiedMeasurement> fetchTwoPreviousMeasurements(@NonNull String uuid) {
-        String query = createQuery(uuid, LIMIT_PREVIOUS);
+        Query query = createQuery(uuid, LIMIT_PREVIOUS);
 
-        List<QualifiedMeasurement> status = influxDBClient.getQueryApi()
-                .query(query).stream()
-                .flatMap(t -> t.getRecords().stream())
+        List<QualifiedMeasurement> results = influxDB.query(query, MeasurementCO2.class)
+                .stream()
                 .filter(Objects::nonNull)
                 .limit(LIMIT_PREVIOUS) // redundant, just in case the query would return more
-                .map(fr -> new QualifiedMeasurement(
+
+                .peek(fr -> log.info("{}}", fr))
+                .map(measurement -> new QualifiedMeasurement(
                         new Measurement(
-                                (int) fr.getValue(),
-                                ZonedDateTime.ofInstant(fr.getTime(), ZoneId.systemDefault())
+                                measurement.getCo2Level(),
+                                ZonedDateTime.ofInstant(measurement.getTime(), ZoneId.of("UTC"))
                         ),
-                        SensorStatus.valueOf((String) fr.getValueByKey("status"))
+                        SensorStatus.valueOf(measurement.getStatus())
                 ))
                 .collect(Collectors.toList());
         log.info("{}: {} of up to {} measurements in repository",
-                uuid, status.size(), LIMIT_PREVIOUS);
-
-        return status;
-
-
+                uuid, results.size(), LIMIT_PREVIOUS);
+        return results;
     }
 
     @Override
     public void record(@NonNull String uuid, QualifiedMeasurement qualifiedMeasurement) {
-        log.info("recording");
-        Instant time = qualifiedMeasurement.getMeasurement().getTime().toInstant();
+        Measurement measurement = qualifiedMeasurement.getMeasurement();
+        MeasurementCO2 measurementCO2 = new MeasurementCO2(
+                uuid,
+                measurement.getTime().toInstant(),
+                qualifiedMeasurement.getSensorStatus().name(),
+                measurement.getCo2()
+        );
 
-        Point co2Point = Point
-                .measurement(MEASUREMENT_NAME)
-                .addField("uuid", uuid)
-                .addField("status", qualifiedMeasurement.getSensorStatus().name())
-                .addField("value", qualifiedMeasurement.getMeasurement().getCo2())
-                .time(time, WRITE_PRECISION);
-
-        influxDBClient.getWriteApi().writePoint(co2Point);
+        influxDB.save(measurementCO2);
 
     }
 

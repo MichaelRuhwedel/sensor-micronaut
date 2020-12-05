@@ -23,6 +23,7 @@ micronaut {
 
 ext {
     VERSION_LOMBOK = '1.18.16'
+    VERSION_GROOVY = '3.0.7'
 }
 
 dependencies {
@@ -36,7 +37,13 @@ dependencies {
     // my dependencies
     annotationProcessor "org.projectlombok:lombok:$VERSION_LOMBOK"
     compile 'com.google.guava:guava:28.0-jre'
-    compile "org.influxdb:influxdb-java:2.21"
+    compile("org.influxdb:influxdb-java:2.21"){
+        because 'client for the influxDb'
+    }
+
+    testImplementation"org.codehaus.groovy:groovy-json:$VERSION_GROOVY"
+    testImplementation"org.codehaus.groovy:groovy:$VERSION_GROOVY"
+
     compileOnly("org.projectlombok:lombok:$VERSION_LOMBOK") {
         because 'Syntactical sugar. See https://projectlombok.org/'
     }

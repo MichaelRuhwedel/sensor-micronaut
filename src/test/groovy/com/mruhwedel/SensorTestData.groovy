@@ -8,16 +8,26 @@ import static java.time.ZonedDateTime.now
 abstract class SensorTestData {
     static ANY_UUID = 'any-uuid'
 
-    private static final int CO_2_ALERT_THRESHOLD = 2000
-    private static final int CO_2_OK = CO_2_ALERT_THRESHOLD - 1
-    private static final int CO_2_CRITICAL = CO_2_ALERT_THRESHOLD + 1
+    private static final int CO_2_THRESHOLD = 2000
+
+    private static final int CO_2_BELOW_THRESHOLD = CO_2_THRESHOLD - 1
+    private static final int CO_2_ABOVE_THRESHOLD = CO_2_THRESHOLD + 1
+
     private static final ZonedDateTime SOME_TIME = now()
 
-    static MEASUREMENT_BELOW_THRESHOLD = create(CO_2_OK)
-    static MEASUREMENT_AT_THRESHOLD = create(CO_2_ALERT_THRESHOLD)
-    static MEASUREMENT_ABOVE_THRESHOLD = create(CO_2_CRITICAL)
+    static MEASUREMENT_BELOW_THRESHOLD = createBelowThreshold()
+    static MEASUREMENT_AT_THRESHOLD = create(CO_2_THRESHOLD)
+    static MEASUREMENT_ABOVE_THRESHOLD = createAboveThreshold()
 
-    private static Measurement create(int co2) {
-        return new Measurement(co2, SOME_TIME) // if you want sth. more realistic, use a unique timestamp here
+    static createBelowThreshold(ZonedDateTime time = SOME_TIME) {
+        create(CO_2_BELOW_THRESHOLD, time)
+    }
+
+    static createAboveThreshold(ZonedDateTime time = SOME_TIME) {
+        create(CO_2_ABOVE_THRESHOLD, time)
+    }
+
+    private static Measurement create(int co2, ZonedDateTime time = SOME_TIME) {
+        new Measurement(co2, time)
     }
 }

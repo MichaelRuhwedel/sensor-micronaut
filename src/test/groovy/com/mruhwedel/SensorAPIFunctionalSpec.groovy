@@ -6,11 +6,9 @@ import io.micronaut.http.HttpResponse
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
-import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import org.influxdb.InfluxDB
 import org.influxdb.dto.Query
-import org.influxdb.impl.InfluxDBMapper
 import spock.lang.Specification
 
 import javax.inject.Inject
@@ -24,9 +22,6 @@ import static io.micronaut.http.HttpStatus.NOT_FOUND
 class SensorAPIFunctionalSpec extends Specification {
 
     @Inject
-    EmbeddedServer server;
-
-    @Inject
     @Client("/api/v1/sensors/")
     HttpClient client;
 
@@ -36,29 +31,17 @@ class SensorAPIFunctionalSpec extends Specification {
     @Inject
     DatabaseConfig databaseConfig
 
-    static final JsonSlurper SLURPER = new JsonSlurper()
-
     def setup() {
         wipeDatabase()
     }
 
-    private void wipeDatabase() {
-        def database = databaseConfig.database
-        influxDB.query(
-                new Query("""
-                         drop database $database;
-                         create database $database
-                         """
-                )
-        )
-    }
-
     def '404-Not Found: when nothing is recorded'() {
         when:
-        client.toBlocking().exchange(ANY_UUID).status() == NOT_FOUND
+        client.toBlocking().exchange(ANY_UUID)
 
         then:
-        thrown HttpClientResponseException
+        def e = thrown HttpClientResponseException
+        e.status == NOT_FOUND
     }
 
     def 'OK: after a measurement below threshold is recorded'() {
@@ -162,4 +145,18 @@ class SensorAPIFunctionalSpec extends Specification {
                 .parseText(client.toBlocking().retrieve(ANY_UUID))
                 .status // status field of the json body
     }
+
+    private void wipeDatabase() {
+        def database = databaseConfig.database
+        influxDB.query(
+                new Query("""
+                         drop database $database;
+                         create database $database
+                         """
+                )
+        )
+    }
+
+    static final JsonSlurper SLURPER = new JsonSlurper()
+
 }

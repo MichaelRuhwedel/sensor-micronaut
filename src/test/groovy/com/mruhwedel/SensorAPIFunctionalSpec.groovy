@@ -191,6 +191,28 @@ class SensorAPIFunctionalSpec extends Specification {
         getAlerts(ANY_UUID) == []
     }
 
+    def 'Alerts: will return an alarm with the startTime set to the 3rd measurement above threshold'() {
+        given:
+        def now = ZonedDateTime.now()
+        def measurementsAboveThreshold = (0..2)
+                .collect { createAboveThreshold(now.plusMinutes(it)) }
+
+        def expected = new Alert(
+                measurementsAboveThreshold[2].time,
+                null,
+                measurementsAboveThreshold[0].co2,
+                measurementsAboveThreshold[1].co2,
+                measurementsAboveThreshold[2].co2,
+        )
+
+        when:
+        measurementsAboveThreshold.forEach(this::collectMeasurement)
+        def alerts = getAlerts(ANY_UUID)
+
+        then:
+        alerts == [expected]
+    }
+
     private List<Alert> getAlerts(id) {
         client.toBlocking()
                 .exchange("$id/alerts", List<Alert>)

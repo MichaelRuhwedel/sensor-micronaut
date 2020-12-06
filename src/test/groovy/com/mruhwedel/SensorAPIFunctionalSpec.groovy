@@ -24,7 +24,7 @@ class SensorAPIFunctionalSpec extends Specification {
 
     @Inject
     @Client("/api/v1/sensors/")
-    HttpClient client;
+    HttpClient client
 
     @Inject
     InfluxDB influxDB
@@ -32,6 +32,7 @@ class SensorAPIFunctionalSpec extends Specification {
     @Inject
     DatabaseConfig databaseConfig
 
+    @SuppressWarnings('unused')
     def setup() {
         wipeDatabase()
     }
@@ -163,7 +164,7 @@ class SensorAPIFunctionalSpec extends Specification {
                 .max()
                 .orElseThrow()
 
-        int expectedAvg = Math.round(
+        int expectedAvg = (int) Math.round(
                 measurements.stream()
                         .mapToInt(Measurement::getCo2)
                         .average()

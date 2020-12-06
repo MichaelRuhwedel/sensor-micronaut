@@ -15,7 +15,7 @@ import java.time.Instant;
 public class MetricsCO2 {
 
     @Column(name = "mean")
-    private double mean;
+    private int mean;
 
     @Column(name = "max")
     private int max;

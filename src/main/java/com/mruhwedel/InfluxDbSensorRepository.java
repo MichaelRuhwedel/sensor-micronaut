@@ -3,7 +3,6 @@ package com.mruhwedel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.influxdb.dto.BoundParameterQuery;
 import org.influxdb.dto.Query;
 import org.influxdb.impl.InfluxDBMapper;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +11,6 @@ import javax.inject.Singleton;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -57,10 +55,6 @@ public class InfluxDbSensorRepository implements SensorRepository {
         Query query = createQuery(uuid, LIMIT_PREVIOUS);
         List<QualifiedMeasurement> results = influxDB.query(query, MeasurementCO2.class)
                 .stream()
-                .filter(Objects::nonNull)
-                .limit(LIMIT_PREVIOUS) // redundant, just in case the query would return more
-
-                .peek(fr -> log.info("{}}", fr))
                 .map(measurement -> new QualifiedMeasurement(
                         new Measurement(
                                 measurement.getCo2Level(),
@@ -92,7 +86,7 @@ public class InfluxDbSensorRepository implements SensorRepository {
     @Override
     public Optional<SensorMetrics> readMetrics(@NonNull String uuid) {
         Query query = newQuery(
-                "SELECT MEAN(\"co2_level\"), MAX(\"co2_level\") " +
+                "SELECT ROUND(MEAN(\"co2_level\")) as mean, MAX(\"co2_level\") " +
                         "FROM co2_ppa " +
                         "WHERE uuid = $uuid AND time > now() - 30d"
         )

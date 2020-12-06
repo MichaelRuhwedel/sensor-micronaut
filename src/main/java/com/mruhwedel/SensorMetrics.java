@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SensorMetrics {
     private int maxLast30Days;
-    private double avgLast30Days;
+    private int avgLast30Days;
 }

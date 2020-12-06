@@ -158,9 +158,16 @@ class SensorAPIFunctionalSpec extends Specification {
     def 'will return the maximum & average of the last 30 days'() {
         given:
         def measurements = generateRandomMeasurementsForA30DayWindow()
-        def expected = new SensorMetrics(
-                measurements.stream().mapToInt(Measurement::getCo2).max().orElse(0),
-                measurements.stream().mapToInt(Measurement::getCo2).average().orElse(0d)
+        def expectedMax = measurements.stream()
+                .mapToInt(Measurement::getCo2)
+                .max()
+                .orElseThrow()
+
+        int expectedAvg = Math.round(
+                measurements.stream()
+                        .mapToInt(Measurement::getCo2)
+                        .average()
+                        .orElseThrow()
         )
 
         when: 'all the samples have collected by the API '
@@ -170,20 +177,23 @@ class SensorAPIFunctionalSpec extends Specification {
         def metrics = readMetrics(ANY_UUID)
 
         then:
-        metrics == expected
+        metrics == new SensorMetrics(
+                expectedMax,
+                expectedAvg
+        )
 
     }
 
     private static List<Measurement> generateRandomMeasurementsForA30DayWindow() {
-        def sampleSize = 100
+        def sampleSize = 200
         def averagingWindow = Duration.ofDays(30)
 
         def beginningOfPeriodToAverage = ZonedDateTime.now().minusDays(averagingWindow.toDays())
         def random = new Random(123)
-        (0..sampleSize).stream()
-                .map(ignored -> {
+        (1..sampleSize).stream()
+                .map(i -> {
                     def randomCo2Level = Math.abs(random.nextInt(8000))
-                    def randomMinutes = Math.abs(random.nextInt(averagingWindow.toMinutes().intValue()))
+                    def randomMinutes = i
                     createMeasurement(
                             randomCo2Level,
                             beginningOfPeriodToAverage.plusMinutes(randomMinutes)
@@ -194,8 +204,7 @@ class SensorAPIFunctionalSpec extends Specification {
     }
 
     private HttpResponse<Object> collectMeasurement(Measurement measurements) {
-        client.toBlocking()
-                .exchange(POST("$ANY_UUID/measurements", measurements))
+        client.toBlocking().exchange(POST("$ANY_UUID/measurements", measurements))
     }
 
     String getStatus() {

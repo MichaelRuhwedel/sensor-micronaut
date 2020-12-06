@@ -1,18 +1,19 @@
 package com.mruhwedel;
 
 import io.micronaut.http.annotation.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
-
 import java.util.Optional;
 
 import static io.micronaut.http.HttpStatus.CREATED;
 
 @Slf4j
 @Controller("/api/v1/sensors/{uuid}")
-
 public class SensorAPI {
 
     @Inject

@@ -8,6 +8,8 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static io.micronaut.http.HttpStatus.CREATED;
@@ -30,6 +32,11 @@ public class SensorAPI {
     @Get("/metrics") // media-type defaults to application/json, null will be 404
     public @NonNull Optional<SensorMetrics> metrics(@QueryValue("uuid") String uuid) {
         return sensorService.readMetrics(uuid);
+    }
+
+    @Get("/alerts") // media-type defaults to application/json, null will be 404
+    public @NonNull List<Alert> alerts(@QueryValue("uuid") String uuid) {
+        return Collections.emptyList();
     }
 
     @Post("/measurements")

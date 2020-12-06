@@ -15,6 +15,7 @@ import java.time.Duration
 import java.time.ZonedDateTime
 
 import static com.mruhwedel.SensorTestData.*
+import static com.mruhwedel.SensorTestData.ANY_UUID
 import static io.micronaut.http.HttpRequest.POST
 import static io.micronaut.http.HttpStatus.NOT_FOUND
 import static java.util.stream.Collectors.toList
@@ -156,7 +157,7 @@ class SensorAPIFunctionalSpec extends Specification {
                 .body()
     }
 
-    def 'will return the maximum & average of the last 30 days'() {
+    def 'Metrics: Will return the maximum & average of the last 30 days'() {
         given:
         def measurements = generateRandomMeasurementsForA30DayWindow()
         def expectedMax = measurements.stream()
@@ -183,6 +184,17 @@ class SensorAPIFunctionalSpec extends Specification {
                 expectedAvg
         )
 
+    }
+
+    def 'Alerts: Will return an empty list if none have been recorded'() {
+        expect:
+        getAlerts(ANY_UUID) == []
+    }
+
+    private List<Alert> getAlerts(id) {
+        client.toBlocking()
+                .exchange("$id/alerts", List<Alert>)
+                .body()
     }
 
     private static List<Measurement> generateRandomMeasurementsForA30DayWindow() {

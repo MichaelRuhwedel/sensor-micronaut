@@ -94,7 +94,6 @@ task influxDbTestIsUp() {
                 new URL("http://localhost:9086/status").text
                 dbIsStarting = false
             } catch (ignored) {
-                println(ignored)
             }
         }
     }

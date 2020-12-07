@@ -36,19 +36,16 @@ dependencies {
     implementation("io.micronaut:micronaut-http-client")
     runtimeOnly("ch.qos.logback:logback-classic")
 
-    // my dependencies
+    // our dependencies
     annotationProcessor "org.projectlombok:lombok:$VERSION_LOMBOK"
-    compile 'com.google.guava:guava:28.0-jre'
     compile("org.influxdb:influxdb-java:2.21") {
         because 'client for the influxDb'
     }
-
-    testImplementation "org.codehaus.groovy:groovy:$VERSION_GROOVY"
-
     compileOnly("org.projectlombok:lombok:$VERSION_LOMBOK") {
         because 'Syntactical sugar. See https://projectlombok.org/'
     }
 
+    testImplementation "org.codehaus.groovy:groovy:$VERSION_GROOVY"
 }
 
 

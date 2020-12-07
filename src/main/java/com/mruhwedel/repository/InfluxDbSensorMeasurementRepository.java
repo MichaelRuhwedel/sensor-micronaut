@@ -1,6 +1,7 @@
 package com.mruhwedel.repository;
 
-import com.mruhwedel.*;
+import com.mruhwedel.domain.SensorMeasurement;
+import com.mruhwedel.domain.SensorMetrics;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

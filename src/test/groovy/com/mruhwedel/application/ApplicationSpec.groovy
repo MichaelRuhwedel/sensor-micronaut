@@ -1,4 +1,4 @@
-package com.mruhwedel
+package com.mruhwedel.application
 
 import io.micronaut.runtime.EmbeddedApplication
 import io.micronaut.test.extensions.spock.annotation.MicronautTest

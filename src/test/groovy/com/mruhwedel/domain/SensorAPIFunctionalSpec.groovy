@@ -1,6 +1,6 @@
-package com.mruhwedel
+package com.mruhwedel.domain
 
-import com.mruhwedel.InfluxDbFactory.DatabaseConfig
+import com.mruhwedel.application.InfluxDbFactory.DatabaseConfig
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
@@ -13,12 +13,12 @@ import spock.lang.Specification
 import javax.inject.Inject
 import java.time.Duration
 
-import static com.mruhwedel.SensorTestData.*
 import static io.micronaut.core.type.Argument.listOf
 import static io.micronaut.http.HttpRequest.GET
 import static io.micronaut.http.HttpRequest.POST
 import static io.micronaut.http.HttpStatus.NOT_FOUND
 import static java.util.stream.Collectors.toList
+import static com.mruhwedel.domain.SensorTestData.*
 
 @MicronautTest(environments = ['functional-test'])
 class SensorAPIFunctionalSpec extends Specification {

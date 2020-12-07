@@ -1,11 +1,6 @@
 package com.mruhwedel;
 
-import lombok.NonNull;
-
 import javax.inject.Singleton;
-import java.util.List;
-
-import static com.mruhwedel.SensorStatus.*;
 
 @Singleton
 public class StatusCalculator {

@@ -1,4 +1,4 @@
-package com.mruhwedel;
+package com.mruhwedel.domain;
 
 import io.micronaut.http.annotation.*;
 import lombok.AllArgsConstructor;

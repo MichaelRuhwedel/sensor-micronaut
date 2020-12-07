@@ -1,4 +1,4 @@
-package com.mruhwedel;
+package com.mruhwedel.application;
 
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.runtime.Micronaut;

@@ -1,4 +1,7 @@
-package com.mruhwedel
+package com.mruhwedel.domain
+
+import com.mruhwedel.domain.Alert
+import com.mruhwedel.domain.SensorMeasurement
 
 import java.time.ZoneId
 import java.time.ZonedDateTime

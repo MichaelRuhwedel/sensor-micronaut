@@ -1,5 +1,6 @@
-package com.mruhwedel;
+package com.mruhwedel.domain;
 
+import com.mruhwedel.StatusCalculator;
 import com.mruhwedel.repository.AlertRepository;
 import com.mruhwedel.repository.SensorMeasurementRepository;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
-import static com.mruhwedel.SensorStatus.*;
+import static com.mruhwedel.domain.SensorStatus.*;
 import static java.time.ZonedDateTime.now;
 import static lombok.AccessLevel.PACKAGE;
 

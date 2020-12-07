@@ -1,7 +1,7 @@
 package com.mruhwedel.repository;
 
-import com.mruhwedel.SensorMeasurement;
-import com.mruhwedel.SensorMetrics;
+import com.mruhwedel.domain.SensorMeasurement;
+import com.mruhwedel.domain.SensorMetrics;
 import lombok.NonNull;
 
 import java.util.List;

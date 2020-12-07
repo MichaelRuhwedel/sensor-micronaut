@@ -1,4 +1,4 @@
-package com.mruhwedel;
+package com.mruhwedel.application;
 
 import io.micronaut.context.annotation.ConfigurationProperties;
 import io.micronaut.context.annotation.Factory;
@@ -13,9 +13,12 @@ import org.influxdb.impl.InfluxDBMapper;
 import javax.inject.Singleton;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Creates the database access beans from the "influxdb.*" path in application.yml
+ */
 @Factory
 @RequiredArgsConstructor
-class InfluxDbFactory {
+public class InfluxDbFactory {
 
     private final DatabaseConfig databaseConfig;
 
@@ -48,9 +51,12 @@ class InfluxDbFactory {
         }
     }
 
+    /**
+     * see application.yaml influx.*
+     */
     @Data
     @ConfigurationProperties("influxdb")
-    static class DatabaseConfig {
+    public static class DatabaseConfig {
         private String url;
         private String username;
         private String password;

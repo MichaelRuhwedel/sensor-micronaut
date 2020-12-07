@@ -1,6 +1,6 @@
 package com.mruhwedel.repository;
 
-import com.mruhwedel.Alert;
+import com.mruhwedel.domain.Alert;
 import lombok.NonNull;
 
 import java.util.List;

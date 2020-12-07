@@ -1,4 +1,4 @@
-package com.mruhwedel
+package com.mruhwedel.domain
 
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
@@ -6,8 +6,8 @@ import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import spock.lang.Specification
 
 import javax.inject.Inject
+import static com.mruhwedel.domain.SensorTestData.*
 
-import static com.mruhwedel.SensorTestData.ANY_UUID
 import static io.micronaut.http.HttpRequest.POST
 import static io.micronaut.http.HttpStatus.CREATED
 

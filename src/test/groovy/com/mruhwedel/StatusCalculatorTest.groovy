@@ -1,11 +1,6 @@
 package com.mruhwedel
 
 import spock.lang.Specification
-import spock.lang.Unroll
-
-import static com.mruhwedel.SensorStatus.*
-import static com.mruhwedel.SensorTestData.*
-import static com.mruhwedel.SensorTestData.MEASUREMENT_BELOW_THRESHOLD
 
 class StatusCalculatorTest extends Specification {
 

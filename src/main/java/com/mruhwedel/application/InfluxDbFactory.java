@@ -2,8 +2,8 @@ package com.mruhwedel.application;
 
 import io.micronaut.context.annotation.ConfigurationProperties;
 import io.micronaut.context.annotation.Factory;
-import io.micronaut.context.annotation.Value;
-import lombok.*;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import org.influxdb.InfluxDB;

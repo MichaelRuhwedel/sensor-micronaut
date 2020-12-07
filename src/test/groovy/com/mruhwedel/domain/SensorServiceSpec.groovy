@@ -1,31 +1,12 @@
 package com.mruhwedel.domain
 
-import com.mruhwedel.StatusCalculator
+
 import com.mruhwedel.repository.AlertRepository
 import com.mruhwedel.repository.SensorMeasurementRepository
-import org.influxdb.annotation.Measurement
 import spock.lang.Specification
-import spock.lang.Unroll
 
 import static com.mruhwedel.domain.SensorStatus.*
 import static com.mruhwedel.domain.SensorTestData.*
-import static com.mruhwedel.domain.SensorTestData.ANY_UUID
-import static com.mruhwedel.domain.SensorTestData.ANY_UUID
-import static com.mruhwedel.domain.SensorTestData.ANY_UUID
-import static com.mruhwedel.domain.SensorTestData.MEASUREMENT_ABOVE_THRESHOLD
-import static com.mruhwedel.domain.SensorTestData.MEASUREMENT_ABOVE_THRESHOLD
-import static com.mruhwedel.domain.SensorTestData.MEASUREMENT_ABOVE_THRESHOLD
-import static com.mruhwedel.domain.SensorTestData.MEASUREMENT_ABOVE_THRESHOLD
-import static com.mruhwedel.domain.SensorTestData.MEASUREMENT_ABOVE_THRESHOLD
-import static com.mruhwedel.domain.SensorTestData.MEASUREMENT_ABOVE_THRESHOLD
-import static com.mruhwedel.domain.SensorTestData.MEASUREMENT_BELOW_THRESHOLD
-import static com.mruhwedel.domain.SensorTestData.MEASUREMENT_BELOW_THRESHOLD
-import static com.mruhwedel.domain.SensorTestData.MEASUREMENT_BELOW_THRESHOLD
-import static com.mruhwedel.domain.SensorTestData.MEASUREMENT_BELOW_THRESHOLD
-import static com.mruhwedel.domain.SensorTestData.MEASUREMENT_BELOW_THRESHOLD
-import static com.mruhwedel.domain.SensorTestData.MEASUREMENT_BELOW_THRESHOLD
-import static com.mruhwedel.domain.SensorTestData.MEASUREMENT_BELOW_THRESHOLD
-import static com.mruhwedel.domain.SensorTestData.MEASUREMENT_BELOW_THRESHOLD
 
 class SensorServiceSpec extends Specification {
 
@@ -33,7 +14,6 @@ class SensorServiceSpec extends Specification {
     def service = new SensorService(
             Mock(SensorMeasurementRepository),
             Mock(AlertRepository),
-            Mock(StatusCalculator)
     )
 
     def "readStatus() OK: No previous alert or an ended one AND the current measurement is below threshold"() {

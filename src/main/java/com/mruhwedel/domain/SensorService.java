@@ -1,6 +1,5 @@
 package com.mruhwedel.domain;
 
-import com.mruhwedel.StatusCalculator;
 import com.mruhwedel.repository.AlertRepository;
 import com.mruhwedel.repository.SensorMeasurementRepository;
 import lombok.Getter;
@@ -9,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Singleton;
-
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -18,7 +15,6 @@ import java.util.function.Predicate;
 import static com.mruhwedel.domain.Alert.LIMIT_FOR_ALARM;
 import static com.mruhwedel.domain.Alert.LIMIT_FOR_ALL_CLEAR;
 import static com.mruhwedel.domain.SensorStatus.*;
-import static java.time.ZonedDateTime.now;
 import static lombok.AccessLevel.PACKAGE;
 
 @Slf4j
@@ -29,7 +25,6 @@ public class SensorService {
 
     private final SensorMeasurementRepository sensorMeasurementRepository;
     private final AlertRepository alertRepository;
-    private final StatusCalculator statusCalculator;
 
     @NonNull
     Optional<SensorStatus> readStatus(@NonNull String uuid) {

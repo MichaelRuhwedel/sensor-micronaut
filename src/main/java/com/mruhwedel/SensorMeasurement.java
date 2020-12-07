@@ -9,7 +9,7 @@ import java.time.ZonedDateTime;
 @Data
 @NoArgsConstructor // used by micronaut
 @AllArgsConstructor // convenience
-class SensorMeasurement {
+public class SensorMeasurement {
     /**
      * CO2 Levels between 2000 and 5000 ppm are associated with headaches, sleepiness
      * poor concentration, loss of attention, increased heart rate and slight nausea

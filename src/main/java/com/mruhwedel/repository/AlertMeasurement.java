@@ -1,4 +1,4 @@
-package com.mruhwedel;
+package com.mruhwedel.repository;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,8 +11,8 @@ import java.time.Instant;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Measurement(name= "alert_co2")
-public class AlertCo2 {
+@Measurement(name = "alert_co2")
+public class AlertMeasurement {
     @Column(name = "time")
     private Instant startTime;
 

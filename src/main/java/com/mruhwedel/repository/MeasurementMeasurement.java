@@ -1,4 +1,4 @@
-package com.mruhwedel;
+package com.mruhwedel.repository;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +12,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 @Measurement(name = "co2_ppa", database = "sensors")
-public class MeasurementCO2 {
+public class MeasurementMeasurement { // suffixed all indexDb measurements with measurement -> measurementMeasurement :)
 
     @Column(name = "uuid")
     private String uuid;

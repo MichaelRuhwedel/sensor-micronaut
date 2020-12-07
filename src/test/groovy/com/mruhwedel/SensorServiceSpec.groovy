@@ -1,5 +1,7 @@
 package com.mruhwedel
 
+import com.mruhwedel.repository.AlertRepository
+import com.mruhwedel.repository.SensorMeasurementRepository
 import spock.lang.Specification
 
 import static com.mruhwedel.SensorStatus.ALERT

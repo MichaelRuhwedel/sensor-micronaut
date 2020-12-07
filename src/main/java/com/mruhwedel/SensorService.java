@@ -1,5 +1,7 @@
 package com.mruhwedel;
 
+import com.mruhwedel.repository.AlertRepository;
+import com.mruhwedel.repository.SensorMeasurementRepository;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

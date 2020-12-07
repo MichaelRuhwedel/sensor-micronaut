@@ -1,5 +1,6 @@
-package com.mruhwedel;
+package com.mruhwedel.repository;
 
+import com.mruhwedel.Alert;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.influxdb.dto.BoundParameterQuery;
@@ -18,10 +19,10 @@ import static org.influxdb.dto.BoundParameterQuery.QueryBuilder.newQuery;
 
 @Singleton
 @RequiredArgsConstructor
-public class InfluxDbAlertRepository implements AlertRepository {
+class InfluxDbAlertRepository implements AlertRepository {
     private final InfluxDBMapper influxDBMapper;
 
-    private static Alert measurementToDomain(AlertCo2 a) {
+    private static Alert measurementToDomain(AlertMeasurement a) {
         return new Alert(
                 a.getStartTime().atZone(ZoneId.systemDefault()),
                 a.getEndTime() == -1 ? null : Instant.ofEpochSecond(a.getEndTime()).atZone(ZoneId.systemDefault()),
@@ -34,7 +35,7 @@ public class InfluxDbAlertRepository implements AlertRepository {
     @Override
     public Optional<Alert> getLatestOngoing(@NonNull String uuid) {
         return influxDBMapper
-                .query(queryForLatestOngoing(uuid), AlertCo2.class).stream()
+                .query(queryForLatestOngoing(uuid), AlertMeasurement.class).stream()
                 .findFirst()
                 .map(InfluxDbAlertRepository::measurementToDomain);
 
@@ -57,8 +58,8 @@ public class InfluxDbAlertRepository implements AlertRepository {
     }
 
     @NotNull
-    private AlertCo2 domainToMeasurement(String uuid, Alert alert) {
-        return new AlertCo2(
+    private AlertMeasurement domainToMeasurement(String uuid, Alert alert) {
+        return new AlertMeasurement(
                 alert.getStartTime().toInstant(),
                 Optional.ofNullable(alert.getEndTime()).map(et -> et.toInstant().getEpochSecond()).orElse(-1L),
                 alert.getMeasurement1(),
@@ -79,8 +80,9 @@ public class InfluxDbAlertRepository implements AlertRepository {
                 .create();
 
         return influxDBMapper
-                .query(queryAll, AlertCo2.class)
+                .query(queryAll, AlertMeasurement.class)
                 .stream().map(InfluxDbAlertRepository::measurementToDomain)
                 .collect(Collectors.toList());
     }
+
 }

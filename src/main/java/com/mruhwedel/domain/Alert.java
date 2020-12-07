@@ -17,7 +17,15 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Alert {
+    /**
+     * Consecutive measurements ABOVE the limit that will trigger an alarm
+     */
     public static final int LIMIT_FOR_ALARM = 3;
+
+    /**
+     * Consecutive measurements BELOW the limit that will end an alarm (all-clear)
+     */
+    public static final int LIMIT_FOR_ALL_CLEAR = 3;
 
     /**
      * When the alarm started, the timestamp of measurement3

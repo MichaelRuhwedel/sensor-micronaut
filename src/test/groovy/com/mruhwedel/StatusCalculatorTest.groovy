@@ -6,7 +6,7 @@ class StatusCalculatorTest extends Specification {
 
 //    static final QM_OK = new QualifiedMeasurement(MEASUREMENT_AT_THRESHOLD, OK)
 //    static final QM_WARN = new QualifiedMeasurement(MEASUREMENT_ABOVE_THRESHOLD, WARN)
-//    static final QM_ALERT = new QualifiedMeasurement(MEASUREMENT_ABOVE_THRESHOLD, ALERT)
+//    static final MEASUREMENT_ABOVE_THRESHOLD = new QualifiedMeasurement(MEASUREMENT_ABOVE_THRESHOLD, ALERT)
 //    def calculator = new StatusCalculator()
 //
 //    @Unroll("expected: #expected when current: #current.co2 previous: #previous ")
@@ -25,16 +25,16 @@ class StatusCalculatorTest extends Specification {
 //        [QM_OK]             | MEASUREMENT_ABOVE_THRESHOLD || WARN
 //
 //
-//        [QM_ALERT]          | MEASUREMENT_BELOW_THRESHOLD || ALERT
-//        [QM_ALERT] * 2      | MEASUREMENT_BELOW_THRESHOLD || ALERT
-//        [QM_OK, QM_ALERT]   | MEASUREMENT_BELOW_THRESHOLD || OK
+//        [MEASUREMENT_ABOVE_THRESHOLD]          | MEASUREMENT_BELOW_THRESHOLD || ALERT
+//        [MEASUREMENT_ABOVE_THRESHOLD] * 2      | MEASUREMENT_BELOW_THRESHOLD || ALERT
+//        [QM_OK, MEASUREMENT_ABOVE_THRESHOLD]   | MEASUREMENT_BELOW_THRESHOLD || OK
 //        [QM_OK] * 2         | MEASUREMENT_BELOW_THRESHOLD || OK
 //
 //
 //        [QM_OK, QM_WARN]    | MEASUREMENT_ABOVE_THRESHOLD || WARN
 //
 //        [QM_WARN]           | MEASUREMENT_ABOVE_THRESHOLD || WARN
-//        [QM_ALERT, QM_WARN] | MEASUREMENT_BELOW_THRESHOLD || ALERT
+//        [MEASUREMENT_ABOVE_THRESHOLD, QM_WARN] | MEASUREMENT_BELOW_THRESHOLD || ALERT
 //
 //        [QM_WARN] * 2       | MEASUREMENT_ABOVE_THRESHOLD || ALERT
 //        [QM_OK, QM_WARN]    | MEASUREMENT_ABOVE_THRESHOLD || WARN

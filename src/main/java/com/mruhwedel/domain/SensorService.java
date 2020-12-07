@@ -53,20 +53,21 @@ public class SensorService {
         sensorMeasurementRepository.collect(uuid, measurement);
         List<SensorMeasurement> measurements = sensorMeasurementRepository.fetchLastThreeMeasurements(uuid);
         int aboveThreshold = (int) measurements.stream().filter(SensorMeasurement::isAboveThreshold).count();
+        int belowThreshold = (int) measurements.stream().filter(SensorMeasurement::isBelowThreshold).count();
 
         if (aboveThreshold == Alert.LIMIT_FOR_ALARM) {
             if (alertRepository.getLatestOngoing(uuid).isEmpty()) {
                 createNewAlarm(uuid, measurements);
             }
-        } else if (aboveThreshold == 0) { // last three measurements were OK we can end the alert
+        } else if (belowThreshold == Alert.LIMIT_FOR_ALL_CLEAR) {
             alertRepository.getLatestOngoing(uuid).ifPresent(ongoingAlert -> {
-                endAlarm(uuid, ongoingAlert);
+                endAlarm(uuid, ongoingAlert, measurements.stream().findFirst().orElseThrow());
             });
         }
     }
 
-    private void endAlarm(String uuid, Alert ongoingAlert) {
-        ongoingAlert.setEndTime(now(ZoneId.of("UTC")));
+    private void endAlarm(String uuid, Alert ongoingAlert, SensorMeasurement sensorMeasurement) {
+        ongoingAlert.setEndTime(sensorMeasurement.getTime());
         alertRepository.save(uuid, ongoingAlert);
     }
 

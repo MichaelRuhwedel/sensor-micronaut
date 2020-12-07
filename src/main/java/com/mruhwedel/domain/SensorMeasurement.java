@@ -23,4 +23,8 @@ public class SensorMeasurement {
     boolean isAboveThreshold() {
         return co2 > CO_PPM_WARN_THRESHOLD;
     }
+
+    boolean isBelowThreshold() {
+        return co2 < CO_PPM_WARN_THRESHOLD;
+    }
 }

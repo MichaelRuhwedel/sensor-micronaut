@@ -21,7 +21,6 @@ import static lombok.AccessLevel.PACKAGE;
 @RequiredArgsConstructor
 public class SensorService {
 
-    public static final int LIMIT_FOR_ALARM = 3;
     private final SensorRepository sensorRepository;
     private final AlertRepository alertRepository;
     private final StatusCalculator statusCalculator;
@@ -52,28 +51,32 @@ public class SensorService {
         List<Measurement> measurements = sensorRepository.fetchLastThreeMeasurements(uuid);
         int aboveThreshold = (int) measurements.stream().filter(Measurement::isAboveThreshold).count();
 
-        switch (aboveThreshold) {
-            case LIMIT_FOR_ALARM:
-                if (alertRepository.getLatestOngoing(uuid).isEmpty()) {
-                    alertRepository.save(
-                            uuid,
-                            new Alert(
-                                    measurements.get(0).getTime(),
-                                    null,
-                                    measurements.get(2).getCo2(),
-                                    measurements.get(1).getCo2(),
-                                    measurements.get(0).getCo2()
-                            ));
-                }
-                break;
-            case 0: // last three measurements were OK we can end the alert
-                alertRepository.getLatestOngoing(uuid).ifPresent(ongoingAlert -> {
-                    ongoingAlert.setEndTime(now(ZoneId.of("UTC")));
-                    alertRepository.save(uuid, ongoingAlert);
-                });
-                break;
-            default:
+        if (aboveThreshold == Alert.LIMIT_FOR_ALARM) {
+            if (alertRepository.getLatestOngoing(uuid).isEmpty()) {
+                createNewAlarm(uuid, measurements);
+            }
+        } else if (aboveThreshold == 0) { // last three measurements were OK we can end the alert
+            alertRepository.getLatestOngoing(uuid).ifPresent(ongoingAlert -> {
+                endAlarm(uuid, ongoingAlert);
+            });
         }
+    }
+
+    private void endAlarm(String uuid, Alert ongoingAlert) {
+        ongoingAlert.setEndTime(now(ZoneId.of("UTC")));
+        alertRepository.save(uuid, ongoingAlert);
+    }
+
+    private void createNewAlarm(String uuid, List<Measurement> measurements) {
+        alertRepository.save(
+                uuid,
+                new Alert(
+                        measurements.get(0).getTime(),
+                        null,
+                        measurements.get(2).getCo2(),
+                        measurements.get(1).getCo2(),
+                        measurements.get(0).getCo2()
+                ));
     }
 
     @NonNull

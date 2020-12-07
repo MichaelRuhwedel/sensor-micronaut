@@ -75,7 +75,7 @@ class SensorServiceSpec extends Specification {
         service.recordAndUpdateAlert(ANY_UUID, currentMeasurement)
 
         then:
-        1 * service.sensorMeasurementRepository.collect(ANY_UUID, currentMeasurement)
+        1 * service.sensorMeasurementRepository.write(ANY_UUID, currentMeasurement)
         _ * service.sensorMeasurementRepository.fetchLastThreeMeasurements(_) >> []
     }
 

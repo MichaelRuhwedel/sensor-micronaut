@@ -1,5 +1,6 @@
 package com.mruhwedel.domain
 
+import com.mruhwedel.SensorAPI
 import com.mruhwedel.application.InfluxDbFactory.DatabaseConfig
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.client.HttpClient

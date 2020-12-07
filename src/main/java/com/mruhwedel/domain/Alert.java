@@ -52,7 +52,7 @@ public class Alert {
      */
     private int measurement3;
 
-    boolean isOngoing() {
+    public boolean isOngoing() {
         return endTime == null;
     }
 }

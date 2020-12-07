@@ -27,7 +27,7 @@ public class SensorService {
     private final AlertRepository alertRepository;
 
     @NonNull
-    Optional<SensorStatus> readStatus(@NonNull String uuid) {
+    public Optional<SensorStatus> readStatus(@NonNull String uuid) {
         return alertRepository
                 .getLatestOngoing(uuid)
                 .filter(Alert::isOngoing)
@@ -39,16 +39,15 @@ public class SensorService {
                 );
     }
 
-
     @NonNull
-    Optional<SensorMetrics> readMetrics(@NonNull String uuid) {
+    public Optional<SensorMetrics> readMetrics(@NonNull String uuid) {
         Optional<SensorMetrics> metrics = sensorMeasurementRepository.readMetrics(uuid);
         log.info("{}:  {}", uuid, metrics.map(Object::toString).orElse("UNKNOWN"));
         return metrics;
     }
 
-    void recordAndUpdateAlert(@NonNull String uuid, @NonNull SensorMeasurement measurement) {
-        sensorMeasurementRepository.collect(uuid, measurement);
+    public void recordAndUpdateAlert(@NonNull String uuid, @NonNull SensorMeasurement measurement) {
+        sensorMeasurementRepository.write(uuid, measurement);
         List<SensorMeasurement> measurements = sensorMeasurementRepository.fetchLastThreeMeasurements(uuid);
 
         if (LIMIT_FOR_ALARM == count(measurements, SensorMeasurement::isAboveThreshold)) {

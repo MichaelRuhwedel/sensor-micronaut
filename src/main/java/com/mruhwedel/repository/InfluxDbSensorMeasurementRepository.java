@@ -68,14 +68,14 @@ class InfluxDbSensorMeasurementRepository implements SensorMeasurementRepository
     }
 
     @Override
-    public void collect(@NonNull String uuid, SensorMeasurement measurement) {
-        MeasurementMeasurement measurementMeasurement = new MeasurementMeasurement(
-                uuid,
-                measurement.getTime().toInstant(),
-                measurement.getCo2()
+    public void write(@NonNull String uuid, SensorMeasurement measurement) {
+        influxDB.save(
+                new MeasurementMeasurement(
+                        uuid,
+                        measurement.getTime().toInstant(),
+                        measurement.getCo2()
+                )
         );
-
-        influxDB.save(measurementMeasurement);
     }
 
     @Override

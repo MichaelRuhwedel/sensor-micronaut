@@ -1,6 +1,6 @@
 package com.mruhwedel.domain;
 
-enum SensorStatus {
+public enum SensorStatus {
     OK,
     WARN,
     ALERT

@@ -17,14 +17,26 @@ public class SensorMeasurement {
      */
     static final int CO_PPM_WARN_THRESHOLD = 2000;
 
+    /**
+     * the co2 level recorded by a sensor
+     */
     private int co2;
+
+    /**
+     * When the recording took place
+     */
     private ZonedDateTime time;
 
-    boolean isAboveThreshold() {
+    /**
+     * @see this#CO_PPM_WARN_THRESHOLD
+     */
+    public boolean isAboveThreshold() {
         return co2 > CO_PPM_WARN_THRESHOLD;
     }
-
-    boolean isBelowThreshold() {
+    /**
+     * @see this#CO_PPM_WARN_THRESHOLD
+     */
+    public boolean isBelowThreshold() {
         return co2 < CO_PPM_WARN_THRESHOLD;
     }
 }

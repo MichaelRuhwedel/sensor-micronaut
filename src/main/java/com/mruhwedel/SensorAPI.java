@@ -1,5 +1,6 @@
-package com.mruhwedel.domain;
+package com.mruhwedel;
 
+import com.mruhwedel.domain.*;
 import io.micronaut.http.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -51,7 +52,7 @@ public class SensorAPI {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    static class StatusDto {
+    public static class StatusDto {
         private SensorStatus status;
     }
 }

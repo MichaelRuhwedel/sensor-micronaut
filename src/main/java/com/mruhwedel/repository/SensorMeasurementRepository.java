@@ -26,7 +26,7 @@ public interface SensorMeasurementRepository {
     /**
      * Will collect (save) the measurement under the uuid of a sensor.
      */
-    void collect(@NonNull String uuid, @NonNull SensorMeasurement measurement);
+    void write(@NonNull String uuid, @NonNull SensorMeasurement measurement);
 
     /**
      * Let the repository fetch the metrics for sensor of the given uuid.

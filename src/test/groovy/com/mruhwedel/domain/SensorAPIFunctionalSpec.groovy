@@ -13,6 +13,8 @@ import spock.lang.Specification
 import javax.inject.Inject
 import java.time.Duration
 
+import static com.mruhwedel.domain.SensorTestData.ANY_UUID
+import static com.mruhwedel.domain.SensorTestData.ANY_UUID
 import static io.micronaut.core.type.Argument.listOf
 import static io.micronaut.http.HttpRequest.GET
 import static io.micronaut.http.HttpRequest.POST
@@ -62,6 +64,16 @@ class SensorAPIFunctionalSpec extends Specification {
 
         then:
         status == 'WARN'
+    }
+
+    def 'OK: the sensors do not interfere'() {
+        when:
+        collectMeasurement('a', createAboveThreshold())
+        collectMeasurement('b', createBelowThreshold())
+
+        then:
+        getStatus('a') == 'WARN'
+        getStatus('b') == 'OK'
     }
 
     def 'WARN: after two above threshold'() {
@@ -191,6 +203,9 @@ class SensorAPIFunctionalSpec extends Specification {
 
         then:
         actualAlerts == [expected]
+
+        and: 'alerts won\'t interfere'
+        getAlerts('some-other-id') == []
     }
 
     private List<Alert> getAlerts(id) {
@@ -218,13 +233,13 @@ class SensorAPIFunctionalSpec extends Specification {
                 .collect(toList())
     }
 
-    private HttpResponse<Object> collectMeasurement(SensorMeasurement measurements) {
-        client.toBlocking().exchange(POST("$ANY_UUID/measurements", measurements))
+    private HttpResponse<Object> collectMeasurement(id = ANY_UUID, SensorMeasurement measurements) {
+        client.toBlocking().exchange(POST("$id/measurements", measurements))
     }
 
-    String getStatus() {
+    String getStatus(String id = ANY_UUID) {
         client.toBlocking()
-                .exchange(ANY_UUID, SensorAPI.StatusDto)
+                .exchange(id, SensorAPI.StatusDto)
                 .body()
                 .status
     }

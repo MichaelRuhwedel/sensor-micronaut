@@ -10,6 +10,7 @@ import org.influxdb.impl.InfluxDBMapper;
 import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Singleton;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -20,7 +21,8 @@ import static org.influxdb.dto.BoundParameterQuery.QueryBuilder.newQuery;
 
 @Slf4j
 @Singleton
-@RequiredArgsConstructor // if there's only one, it'll be used for injection
+@RequiredArgsConstructor
+        // if there's only one, it'll be used for injection
 class InfluxDbSensorMeasurementRepository implements SensorMeasurementRepository {
 
     public static final int LIMIT_PREVIOUS = 2;

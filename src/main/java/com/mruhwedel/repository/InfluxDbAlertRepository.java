@@ -46,8 +46,8 @@ class InfluxDbAlertRepository implements AlertRepository {
                 "SELECT * FROM alert_co2 " +
                         " WHERE uuid = $uuid " +
                         " AND end_time = -1 " +
-                        "ORDER BY time desc " +
-                        "LIMIT 1"
+                        " ORDER BY time desc " +
+                        " LIMIT 1"
         ).bind("uuid", uuid)
                 .create();
     }

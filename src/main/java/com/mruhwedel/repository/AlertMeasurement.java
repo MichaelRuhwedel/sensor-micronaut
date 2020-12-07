@@ -28,6 +28,6 @@ public class AlertMeasurement {
     @Column(name = "measurement_3")
     private int measurement3;
 
-    @Column(name = "uuid")
+    @Column(name = "uuid", tag = true) // we don't want alerts to overwrite each other so we tag
     private String uuid;
 }

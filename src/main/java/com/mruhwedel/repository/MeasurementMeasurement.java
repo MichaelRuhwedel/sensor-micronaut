@@ -11,10 +11,10 @@ import java.time.Instant;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Measurement(name = "co2_ppa", database = "sensors")
+@Measurement(name = "co2_ppa")
 public class MeasurementMeasurement { // suffixed all indexDb measurements with measurement -> measurementMeasurement :)
 
-    @Column(name = "uuid")
+    @Column(name = "uuid", tag = true) // we don't want measurements to overwrite each other
     private String uuid;
 
     @Column(name = "time")

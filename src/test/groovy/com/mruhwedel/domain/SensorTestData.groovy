@@ -17,7 +17,7 @@ abstract class SensorTestData {
     private static final int CO_2_BELOW_THRESHOLD = CO_2_THRESHOLD - 1
     private static final int CO_2_ABOVE_THRESHOLD = CO_2_THRESHOLD + 1
 
-    static final ZonedDateTime NOW = ZonedDateTime.of(2020, 10, 1, 1, 0, 0, 0,ZoneId.of('UTC')).truncatedTo(SECONDS)
+    static final ZonedDateTime NOW = now(ZoneId.of("UTC")).truncatedTo(SECONDS)
 
     static MEASUREMENT_BELOW_THRESHOLD = createBelowThreshold()
     static MEASUREMENT_AT_THRESHOLD = createMeasurement(CO_2_THRESHOLD)

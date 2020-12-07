@@ -24,8 +24,8 @@ class InfluxDbAlertRepository implements AlertRepository {
 
     private static Alert measurementToDomain(AlertMeasurement a) {
         return new Alert(
-                a.getStartTime().atZone(ZoneId.systemDefault()),
-                a.getEndTime() == -1 ? null : Instant.ofEpochSecond(a.getEndTime()).atZone(ZoneId.systemDefault()),
+                a.getStartTime().atZone(ZoneId.of("UTC")),
+                a.getEndTime() == -1 ? null : Instant.ofEpochSecond(a.getEndTime()).atZone(ZoneId.of("UTC")),
                 a.getMeasurement1(),
                 a.getMeasurement2(),
                 a.getMeasurement3()

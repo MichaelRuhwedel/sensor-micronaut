@@ -81,7 +81,7 @@ class InfluxDbSensorMeasurementRepository implements SensorMeasurementRepository
         Query query = newQuery(
                 "SELECT ROUND(MEAN(\"co2_level\")) as mean, MAX(\"co2_level\") " +
                         "FROM co2_ppa " +
-                        "WHERE uuid = $uuid AND time > now() - 30d"
+                        "WHERE uuid = $uuid AND now() - 30d < time"
         )
                 .bind("uuid", uuid)
                 .create();

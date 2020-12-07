@@ -1,3 +1,5 @@
+import jdk.internal.net.http.HttpConnection
+
 plugins {
     id("groovy")
     id("com.github.johnrengelman.shadow") version "6.1.0"
@@ -37,11 +39,11 @@ dependencies {
     // my dependencies
     annotationProcessor "org.projectlombok:lombok:$VERSION_LOMBOK"
     compile 'com.google.guava:guava:28.0-jre'
-    compile("org.influxdb:influxdb-java:2.21"){
+    compile("org.influxdb:influxdb-java:2.21") {
         because 'client for the influxDb'
     }
 
-    testImplementation"org.codehaus.groovy:groovy:$VERSION_GROOVY"
+    testImplementation "org.codehaus.groovy:groovy:$VERSION_GROOVY"
 
     compileOnly("org.projectlombok:lombok:$VERSION_LOMBOK") {
         because 'Syntactical sugar. See https://projectlombok.org/'
@@ -59,18 +61,67 @@ java {
     targetCompatibility = JavaVersion.toVersion("11")
 }
 
-task influxDbStart(type: Exec) {
-    commandLine 'docker', 'run',
-            '--name', 'influxdb',
-            '--rm',
-            '-e', 'INFLUXDB_DATA_QUERY_LOG_ENABLED=true', // debugging
-            '-e', 'INFLUXDB_DB=sensors', // will bootstrap a db
-            '-e', 'INFLUXDB_HTTP_FLUX_ENABLED=true', // needed for the queries we use
-            '-p', '8086:8086',
-            '-v', 'influxdb:/var/lib/influxdb',
-            'influxdb:1.8-alpine'
+test {
+    dependsOn 'influxDbTestStart', 'influxDbTestIsUp'
+    finalizedBy 'influxDbTestStop'
 }
 
 tasks {
+}
+
+// dev setup
+task influxDbDevStart(type: Exec) {
+    commandLine getDbStartCommand('dev', 8086)
+}
+
+task influxDbDevStop(type: Exec) {
+    commandLine getDbStopCommand('dev')
+    ignoreExitValue = true
+}
+// test setup
+task influxDbTestStart(type: Exec) {
+    doFirst {
+        exec {
+            commandLine getDbStopCommand('test')
+            ignoreExitValue = true
+        }
+    }
+    commandLine getDbStartCommand('test', 9086)
+}
+task influxDbTestIsUp() {
+    mustRunAfter('influxDbTestStart')
+    doFirst {
+        boolean dbIsStarting = true
+        while (dbIsStarting) {
+            try {
+                new URL("http://localhost:9086/status").text
+                dbIsStarting = false
+            } catch (ignored) {
+                println(ignored)
+            }
+        }
+    }
+}
+task influxDbTestStop(type: Exec) {
+    commandLine getDbStopCommand('test')
+    ignoreExitValue = true
+}
+
+static getDbStopCommand(String env) {
+    ['docker', 'stop', "influxdb-$env"]
+}
+
+static getDbStartCommand(String env, int port) {
+    [
+            'docker', 'run',
+            '--name', "influxdb-$env",
+            '-d',
+            '--rm',
+            '-e', 'INFLUXDB_DB=sensors', // will bootstrap a db
+            '-e', 'INFLUXDB_HTTP_FLUX_ENABLED=true', // needed for the queries we use
+            '-p', "$port:8086",
+            '-v', "influxdb-$env:/var/lib/influxdb",
+            'influxdb:1.8-alpine'
+    ]
 }
 

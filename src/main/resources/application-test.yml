@@ -1,0 +1,3 @@
+influxdb:
+  # see influxDbTestStart in build.gradle
+  url: 'http://localhost:9086'

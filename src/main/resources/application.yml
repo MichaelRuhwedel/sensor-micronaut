@@ -1,14 +1,15 @@
 micronaut:
   application:
     name: sensor
-  server:
-    netty:
-      worker:
-        threads: 20
+  executors:
+    io:
+      type: fixed
+      nThreads: 40
 
 influxdb:
   username: 'dev'
   password: 'dev'
+  # see influxDbDevStart in build.gradle
   url: 'http://localhost:8086'
 
   # created by INFLUXDB_DB in build.gradle

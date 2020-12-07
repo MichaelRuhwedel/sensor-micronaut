@@ -14,7 +14,7 @@ import static com.mruhwedel.SensorTestData.MEASUREMENT_BELOW_THRESHOLD
 class SensorServiceSpec extends Specification {
 
     def service = new SensorService(
-            Mock(SensorRepository),
+            Mock(SensorMeasurementRepository),
             Mock(AlertRepository),
             Mock(StatusCalculator)
     )
@@ -25,7 +25,7 @@ class SensorServiceSpec extends Specification {
 
         then:
         1 * service.alertRepository.getLatestOngoing(ANY_UUID) >> alert
-        1 * service.sensorRepository.fetchCurrent(ANY_UUID) >> MEASUREMENT_BELOW_THRESHOLD
+        1 * service.sensorMeasurementRepository.fetchCurrent(ANY_UUID) >> MEASUREMENT_BELOW_THRESHOLD
 
         status
                 .map(OK::equals)
@@ -44,7 +44,7 @@ class SensorServiceSpec extends Specification {
 
         then:
         1 * service.alertRepository.getLatestOngoing(ANY_UUID) >> Optional.empty()
-        1 * service.sensorRepository.fetchCurrent(ANY_UUID) >> MEASUREMENT_ABOVE_THRESHOLD
+        1 * service.sensorMeasurementRepository.fetchCurrent(ANY_UUID) >> MEASUREMENT_ABOVE_THRESHOLD
 
         status
                 .map(WARN::equals)
@@ -63,7 +63,7 @@ class SensorServiceSpec extends Specification {
 
         then:
         1 * service.alertRepository.getLatestOngoing(ANY_UUID) >> Optional.of(ALERT_ONGOING)
-        0 * service.sensorRepository.fetchCurrent(_)
+        0 * service.sensorMeasurementRepository.fetchCurrent(_)
 
         status
                 .map(ALERT::equals)
@@ -77,12 +77,12 @@ class SensorServiceSpec extends Specification {
         def previousMeasurements = []
 
         when:
-        service.recordAndUpdateStatus(ANY_UUID, currentMeasurement)
+        service.recordAndUpdateAlert(ANY_UUID, currentMeasurement)
 
         then:
-        1 * service.sensorRepository.fetchLastThreeMeasurements(ANY_UUID) >> previousMeasurements
+        1 * service.sensorMeasurementRepository.fetchLastThreeMeasurements(ANY_UUID) >> previousMeasurements
         1 * service.statusCalculator.calculateCurrentStatus(currentMeasurement, previousMeasurements) >> currentStatus
-        1 * service.sensorRepository.record(ANY_UUID, currentStatus)
+        1 * service.sensorMeasurementRepository.collect(ANY_UUID, currentStatus)
 
     }
 }

@@ -11,7 +11,7 @@ import java.time.ZonedDateTime;
  * {@code Alarm} will be recorded.
  *
  * @see Alert#LIMIT_FOR_ALARM
- * @see Measurement#CO_PPM_WARN_THRESHOLD
+ * @see SensorMeasurement#CO_PPM_WARN_THRESHOLD
  */
 @Data
 @AllArgsConstructor

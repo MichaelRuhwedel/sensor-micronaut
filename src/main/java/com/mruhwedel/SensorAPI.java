@@ -8,12 +8,10 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static io.micronaut.http.HttpStatus.CREATED;
-import static java.util.Collections.emptyList;
 
 @Slf4j
 @Controller("/api/v1/sensors/{uuid}")
@@ -44,9 +42,9 @@ public class SensorAPI {
     @Status(CREATED)
     public void measurements(
             @QueryValue("uuid") String uuid,
-            @Body Measurement measurement
+            @Body SensorMeasurement measurement
     ) {
-        sensorService.recordAndUpdateStatus(uuid, measurement);
+        sensorService.recordAndUpdateAlert(uuid, measurement);
     }
 
 

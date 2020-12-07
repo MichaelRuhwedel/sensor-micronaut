@@ -21,7 +21,7 @@ import static lombok.AccessLevel.PACKAGE;
 @RequiredArgsConstructor
 public class SensorService {
 
-    private final SensorRepository sensorRepository;
+    private final SensorMeasurementRepository sensorMeasurementRepository;
     private final AlertRepository alertRepository;
     private final StatusCalculator statusCalculator;
 
@@ -31,7 +31,7 @@ public class SensorService {
                 .getLatestOngoing(uuid)
                 .filter(Alert::isOngoing)
                 .map(ongoingAlert -> ALERT) // an ongoing alert is returned as such
-                .or(() -> sensorRepository.fetchCurrent(uuid)
+                .or(() -> sensorMeasurementRepository.fetchCurrent(uuid)
                         .map(current -> current.isAboveThreshold() ?
                                 WARN : OK
                         )
@@ -41,15 +41,15 @@ public class SensorService {
 
     @NonNull
     Optional<SensorMetrics> readMetrics(@NonNull String uuid) {
-        Optional<SensorMetrics> metrics = sensorRepository.readMetrics(uuid);
+        Optional<SensorMetrics> metrics = sensorMeasurementRepository.readMetrics(uuid);
         log.info("{}:  {}", uuid, metrics.map(Object::toString).orElse("UNKNOWN"));
         return metrics;
     }
 
-    void recordAndUpdateStatus(@NonNull String uuid, @NonNull Measurement measurement) {
-        sensorRepository.record(uuid, measurement);
-        List<Measurement> measurements = sensorRepository.fetchLastThreeMeasurements(uuid);
-        int aboveThreshold = (int) measurements.stream().filter(Measurement::isAboveThreshold).count();
+    void recordAndUpdateAlert(@NonNull String uuid, @NonNull SensorMeasurement measurement) {
+        sensorMeasurementRepository.collect(uuid, measurement);
+        List<SensorMeasurement> measurements = sensorMeasurementRepository.fetchLastThreeMeasurements(uuid);
+        int aboveThreshold = (int) measurements.stream().filter(SensorMeasurement::isAboveThreshold).count();
 
         if (aboveThreshold == Alert.LIMIT_FOR_ALARM) {
             if (alertRepository.getLatestOngoing(uuid).isEmpty()) {
@@ -67,7 +67,7 @@ public class SensorService {
         alertRepository.save(uuid, ongoingAlert);
     }
 
-    private void createNewAlarm(String uuid, List<Measurement> measurements) {
+    private void createNewAlarm(String uuid, List<SensorMeasurement> measurements) {
         alertRepository.save(
                 uuid,
                 new Alert(

@@ -146,13 +146,13 @@ class SensorAPIFunctionalSpec extends Specification {
         given:
         def measurements = generateRandomMeasurementsForA30DayWindow()
         def expectedMax = measurements.stream()
-                .mapToInt(Measurement::getCo2)
+                .mapToInt(SensorMeasurement::getCo2)
                 .max()
                 .orElseThrow()
 
         int expectedAvg = (int) Math.round(
                 measurements.stream()
-                        .mapToInt(Measurement::getCo2)
+                        .mapToInt(SensorMeasurement::getCo2)
                         .average()
                         .orElseThrow()
         )
@@ -199,7 +199,7 @@ class SensorAPIFunctionalSpec extends Specification {
                 .body()
     }
 
-    private static List<Measurement> generateRandomMeasurementsForA30DayWindow() {
+    private static List<SensorMeasurement> generateRandomMeasurementsForA30DayWindow() {
         def sampleSize = 100
         def averagingWindow = Duration.ofDays(30)
 
@@ -218,7 +218,7 @@ class SensorAPIFunctionalSpec extends Specification {
                 .collect(toList())
     }
 
-    private HttpResponse<Object> collectMeasurement(Measurement measurements) {
+    private HttpResponse<Object> collectMeasurement(SensorMeasurement measurements) {
         client.toBlocking().exchange(POST("$ANY_UUID/measurements", measurements))
     }
 

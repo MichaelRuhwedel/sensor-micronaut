@@ -19,25 +19,25 @@ import static org.influxdb.dto.BoundParameterQuery.QueryBuilder.newQuery;
 @Slf4j
 @Singleton
 @RequiredArgsConstructor // if there's only one, it'll be used for injection
-public class InfluxDbSensorRepository implements SensorRepository {
+public class InfluxDbSensorMeasurementRepository implements SensorMeasurementRepository {
 
     public static final int LIMIT_PREVIOUS = 2;
 
     @SuppressWarnings("unused") // @injected
     private final InfluxDBMapper influxDB;
 
-    private static Measurement measurementToDomain(MeasurementCO2 measurement) {
-        return new Measurement(
+    private static SensorMeasurement measurementToDomain(MeasurementCO2 measurement) {
+        return new SensorMeasurement(
                 measurement.getCo2Level(),
                 ZonedDateTime.ofInstant(measurement.getTime(), ZoneId.of("UTC"))
         );
     }
 
     @Override
-    public Optional<Measurement> fetchCurrent(@NonNull String uuid) {
+    public Optional<SensorMeasurement> fetchCurrent(@NonNull String uuid) {
         return influxDB.query(createQuery(uuid, 1), MeasurementCO2.class).stream()
                 .findFirst()
-                .map(InfluxDbSensorRepository::measurementToDomain);
+                .map(InfluxDbSensorMeasurementRepository::measurementToDomain);
     }
 
     @NotNull
@@ -53,10 +53,10 @@ public class InfluxDbSensorRepository implements SensorRepository {
     }
 
     @Override
-    public @NonNull List<Measurement> fetchLastThreeMeasurements(@NonNull String uuid) {
-        List<Measurement> results = influxDB.query(createQuery(uuid, 3), MeasurementCO2.class)
+    public @NonNull List<SensorMeasurement> fetchLastThreeMeasurements(@NonNull String uuid) {
+        List<SensorMeasurement> results = influxDB.query(createQuery(uuid, 3), MeasurementCO2.class)
                 .stream()
-                .map(InfluxDbSensorRepository::measurementToDomain)
+                .map(InfluxDbSensorMeasurementRepository::measurementToDomain)
                 .collect(Collectors.toList());
         log.info("{}: {} of up to {} measurements in repository",
                 uuid, results.size(), LIMIT_PREVIOUS);
@@ -64,7 +64,7 @@ public class InfluxDbSensorRepository implements SensorRepository {
     }
 
     @Override
-    public void record(@NonNull String uuid, Measurement measurement) {
+    public void collect(@NonNull String uuid, SensorMeasurement measurement) {
         MeasurementCO2 measurementCO2 = new MeasurementCO2(
                 uuid,
                 measurement.getTime().toInstant(),

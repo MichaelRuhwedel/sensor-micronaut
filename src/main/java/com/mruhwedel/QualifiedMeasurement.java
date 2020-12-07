@@ -4,6 +4,6 @@ import lombok.Value;
 
 @Value
 public class QualifiedMeasurement {
-    Measurement measurement;
+    SensorMeasurement measurement;
     SensorStatus sensorStatus;
 }

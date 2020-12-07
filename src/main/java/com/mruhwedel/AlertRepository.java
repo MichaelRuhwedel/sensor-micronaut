@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface AlertRepository {
     /**
-     * Will get the latest Aler (by start time)
+     * Will get the latest Alert (by start time), whose endTime isn't set
      */
     Optional<Alert> getLatestOngoing(@NonNull String uuid);
 
@@ -16,5 +16,6 @@ public interface AlertRepository {
      */
     void save(@NonNull String uuid, Alert alert);
 
+    @NonNull
     List<Alert> getAll(@NonNull String uuid);
 }

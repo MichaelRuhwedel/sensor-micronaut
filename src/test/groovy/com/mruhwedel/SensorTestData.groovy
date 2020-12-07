@@ -2,9 +2,6 @@ package com.mruhwedel
 
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
-import java.time.temporal.TemporalUnit
-import java.util.concurrent.TimeUnit
 
 import static java.time.ZonedDateTime.now
 import static java.time.temporal.ChronoUnit.SECONDS
@@ -34,8 +31,8 @@ abstract class SensorTestData {
         createMeasurement(CO_2_ABOVE_THRESHOLD, time)
     }
 
-    static Measurement createMeasurement(int co2, ZonedDateTime time = NOW) {
-        new Measurement(co2, time)
+    static SensorMeasurement createMeasurement(int co2, ZonedDateTime time = NOW) {
+        new SensorMeasurement(co2, time)
     }
 
     static createAlertOngoing() {

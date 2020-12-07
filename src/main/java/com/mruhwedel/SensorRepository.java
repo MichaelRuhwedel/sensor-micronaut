@@ -7,12 +7,13 @@ import java.util.Optional;
 
 
 public interface SensorRepository {
-    Optional<SensorStatus> readStatus(@NonNull String uuid);
+
+    Optional<Measurement> fetchCurrent(@NonNull String uuid);
 
     @NonNull
-    List<QualifiedMeasurement> fetchTwoPreviousMeasurements(@NonNull String uuid);
+    List<Measurement> fetchLastThreeMeasurements(@NonNull String uuid);
 
-    void record(@NonNull String uuid, @NonNull QualifiedMeasurement measurement);
+    void record(@NonNull String uuid, @NonNull Measurement measurement);
 
     Optional<SensorMetrics> readMetrics(String uuid);
 }

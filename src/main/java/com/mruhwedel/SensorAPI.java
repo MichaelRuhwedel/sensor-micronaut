@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static io.micronaut.http.HttpStatus.CREATED;
+import static java.util.Collections.emptyList;
 
 @Slf4j
 @Controller("/api/v1/sensors/{uuid}")
@@ -36,7 +37,7 @@ public class SensorAPI {
 
     @Get("/alerts") // media-type defaults to application/json, null will be 404
     public @NonNull List<Alert> alerts(@QueryValue("uuid") String uuid) {
-        return Collections.emptyList();
+        return sensorService.getAlerts(uuid);
     }
 
     @Post("/measurements")

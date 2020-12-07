@@ -20,9 +20,6 @@ public class MeasurementCO2 {
     @Column(name = "time")
     private Instant time;
 
-    @Column(name = "status")
-    private String status;
-
     @Column(name = "co2_level")
     private int co2Level;
 }

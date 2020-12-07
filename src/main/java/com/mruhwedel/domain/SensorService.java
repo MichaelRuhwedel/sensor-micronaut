@@ -13,7 +13,10 @@ import javax.inject.Singleton;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
+import static com.mruhwedel.domain.Alert.LIMIT_FOR_ALARM;
+import static com.mruhwedel.domain.Alert.LIMIT_FOR_ALL_CLEAR;
 import static com.mruhwedel.domain.SensorStatus.*;
 import static java.time.ZonedDateTime.now;
 import static lombok.AccessLevel.PACKAGE;
@@ -52,18 +55,22 @@ public class SensorService {
     void recordAndUpdateAlert(@NonNull String uuid, @NonNull SensorMeasurement measurement) {
         sensorMeasurementRepository.collect(uuid, measurement);
         List<SensorMeasurement> measurements = sensorMeasurementRepository.fetchLastThreeMeasurements(uuid);
-        int aboveThreshold = (int) measurements.stream().filter(SensorMeasurement::isAboveThreshold).count();
-        int belowThreshold = (int) measurements.stream().filter(SensorMeasurement::isBelowThreshold).count();
 
-        if (aboveThreshold == Alert.LIMIT_FOR_ALARM) {
+        if (LIMIT_FOR_ALARM == count(measurements, SensorMeasurement::isAboveThreshold)) {
             if (alertRepository.getLatestOngoing(uuid).isEmpty()) {
                 createNewAlarm(uuid, measurements);
             }
-        } else if (belowThreshold == Alert.LIMIT_FOR_ALL_CLEAR) {
+        } else if (LIMIT_FOR_ALL_CLEAR == count(measurements, SensorMeasurement::isBelowThreshold)) {
             alertRepository.getLatestOngoing(uuid).ifPresent(ongoingAlert -> {
                 endAlarm(uuid, ongoingAlert, measurements.stream().findFirst().orElseThrow());
             });
         }
+    }
+
+    private int count(List<SensorMeasurement> measurements, Predicate<SensorMeasurement> predicate) {
+        return (int) measurements.stream()
+                .filter(predicate)
+                .count();
     }
 
     private void endAlarm(String uuid, Alert ongoingAlert, SensorMeasurement sensorMeasurement) {

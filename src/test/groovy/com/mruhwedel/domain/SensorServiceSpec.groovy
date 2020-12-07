@@ -96,6 +96,7 @@ class SensorServiceSpec extends Specification {
 
         then:
         1 * service.sensorMeasurementRepository.collect(ANY_UUID, currentMeasurement)
+        _ * service.sensorMeasurementRepository.fetchLastThreeMeasurements(_) >> []
     }
 
     def "recordAndUpdateAlert() NO Alert: No alert is recorded when the alert limit is not crossed"(

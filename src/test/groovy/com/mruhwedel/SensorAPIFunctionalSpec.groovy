@@ -12,10 +12,10 @@ import spock.lang.Specification
 
 import javax.inject.Inject
 import java.time.Duration
-import java.time.ZonedDateTime
 
 import static com.mruhwedel.SensorTestData.*
-import static com.mruhwedel.SensorTestData.ANY_UUID
+import static io.micronaut.core.type.Argument.listOf
+import static io.micronaut.http.HttpRequest.GET
 import static io.micronaut.http.HttpRequest.POST
 import static io.micronaut.http.HttpStatus.NOT_FOUND
 import static java.util.stream.Collectors.toList
@@ -65,76 +65,61 @@ class SensorAPIFunctionalSpec extends Specification {
     }
 
     def 'WARN: after two above threshold'() {
-        given:
-        def now = ZonedDateTime.now()
-
         when:
-        collectMeasurement(createAboveThreshold(now))
-        collectMeasurement(createAboveThreshold(now.plusMinutes(1)))
+        collectMeasurement(createAboveThreshold(NOW))
+        collectMeasurement(createAboveThreshold(NOW.plusMinutes(1)))
 
         then:
         status == 'WARN'
     }
 
     def 'ALERT: after three above threshold'() {
-        given:
-        def now = ZonedDateTime.now()
-
         when:
-        collectMeasurement(createAboveThreshold(now))
-        collectMeasurement(createAboveThreshold(now.plusMinutes(1)))
-        collectMeasurement(createAboveThreshold(now.plusMinutes(2)))
+        (0..2)
+                .collect { createAboveThreshold(NOW.plusMinutes(it)) }
+                .forEach(this::collectMeasurement)
 
         then:
         status == 'ALERT'
     }
 
     def 'ALERT: after three above threshold & one below'() {
-        given:
-        def now = ZonedDateTime.now()
-
         when: 'an alert is triggered'
-        collectMeasurement(createAboveThreshold(now))
-        collectMeasurement(createAboveThreshold(now.plusMinutes(1)))
-        collectMeasurement(createAboveThreshold(now.plusMinutes(2)))
+        collectMeasurement(createAboveThreshold(NOW))
+        collectMeasurement(createAboveThreshold(NOW.plusMinutes(1)))
+        collectMeasurement(createAboveThreshold(NOW.plusMinutes(2)))
 
         and: 'measurement is back to normal'
-        collectMeasurement(createBelowThreshold(now.plusMinutes(3)))
+        collectMeasurement(createBelowThreshold(NOW.plusMinutes(3)))
 
         then:
         status == 'ALERT'
     }
 
     def 'ALERT: after three above threshold & two below'() {
-        given:
-        def now = ZonedDateTime.now()
-
         when: 'an alert is triggered'
-        collectMeasurement(createAboveThreshold(now))
-        collectMeasurement(createAboveThreshold(now.plusMinutes(1)))
-        collectMeasurement(createAboveThreshold(now.plusMinutes(2)))
+        collectMeasurement(createAboveThreshold(NOW))
+        collectMeasurement(createAboveThreshold(NOW.plusMinutes(1)))
+        collectMeasurement(createAboveThreshold(NOW.plusMinutes(2)))
 
         and: 'measurement is back to normal'
-        collectMeasurement(createBelowThreshold(now.plusMinutes(3)))
-        collectMeasurement(createBelowThreshold(now.plusMinutes(4)))
+        collectMeasurement(createBelowThreshold(NOW.plusMinutes(3)))
+        collectMeasurement(createBelowThreshold(NOW.plusMinutes(4)))
 
         then:
         status == 'ALERT'
     }
 
     def 'OK: after three above threshold & three below'() {
-        given:
-        def now = ZonedDateTime.now()
-
         when: 'an alert is triggered'
-        collectMeasurement(createAboveThreshold(now))
-        collectMeasurement(createAboveThreshold(now.plusMinutes(1)))
-        collectMeasurement(createAboveThreshold(now.plusMinutes(2)))
+        collectMeasurement(createAboveThreshold(NOW))
+        collectMeasurement(createAboveThreshold(NOW.plusMinutes(1)))
+        collectMeasurement(createAboveThreshold(NOW.plusMinutes(2)))
 
         and: 'measurement is back to normal'
-        collectMeasurement(createBelowThreshold(now.plusMinutes(3)))
-        collectMeasurement(createBelowThreshold(now.plusMinutes(4)))
-        collectMeasurement(createBelowThreshold(now.plusMinutes(5)))
+        collectMeasurement(createBelowThreshold(NOW.plusMinutes(3)))
+        collectMeasurement(createBelowThreshold(NOW.plusMinutes(4)))
+        collectMeasurement(createBelowThreshold(NOW.plusMinutes(5)))
 
         then:
         status == 'OK'
@@ -179,11 +164,7 @@ class SensorAPIFunctionalSpec extends Specification {
         def metrics = readMetrics(ANY_UUID)
 
         then:
-        metrics == new SensorMetrics(
-                expectedMax,
-                expectedAvg
-        )
-
+        metrics == new SensorMetrics(expectedMax, expectedAvg)
     }
 
     def 'Alerts: Will return an empty list if none have been recorded'() {
@@ -193,9 +174,8 @@ class SensorAPIFunctionalSpec extends Specification {
 
     def 'Alerts: will return an alarm with the startTime set to the 3rd measurement above threshold'() {
         given:
-        def now = ZonedDateTime.now()
         def measurementsAboveThreshold = (0..2)
-                .collect { createAboveThreshold(now.plusMinutes(it)) }
+                .collect { createAboveThreshold(NOW.plusMinutes(it)) }
 
         def expected = new Alert(
                 measurementsAboveThreshold[2].time,
@@ -207,23 +187,23 @@ class SensorAPIFunctionalSpec extends Specification {
 
         when:
         measurementsAboveThreshold.forEach(this::collectMeasurement)
-        def alerts = getAlerts(ANY_UUID)
+        def actualAlerts = getAlerts(ANY_UUID)
 
         then:
-        alerts == [expected]
+        actualAlerts == [expected]
     }
 
     private List<Alert> getAlerts(id) {
         client.toBlocking()
-                .exchange("$id/alerts", List<Alert>)
+                .exchange(GET("$id/alerts"), listOf(Alert))
                 .body()
     }
 
     private static List<Measurement> generateRandomMeasurementsForA30DayWindow() {
-        def sampleSize = 200
+        def sampleSize = 100
         def averagingWindow = Duration.ofDays(30)
 
-        def beginningOfPeriodToAverage = ZonedDateTime.now().minusDays(averagingWindow.toDays())
+        def beginningOfPeriodToAverage = NOW.minusDays(averagingWindow.toDays())
         def random = new Random(123)
         (1..sampleSize).stream()
                 .map(i -> {

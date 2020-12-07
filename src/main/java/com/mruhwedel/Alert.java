@@ -15,4 +15,8 @@ public class Alert {
     private int measurement1;
     private int measurement2;
     private int measurement3;
+
+    boolean isOngoing() {
+        return endTime == null;
+    }
 }

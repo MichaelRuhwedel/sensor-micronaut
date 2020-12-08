@@ -10,7 +10,6 @@ import org.influxdb.impl.InfluxDBMapper;
 import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Singleton;
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;

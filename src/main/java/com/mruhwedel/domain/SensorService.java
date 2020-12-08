@@ -53,9 +53,13 @@ public class SensorService {
                 createNewAlarm(uuid, measurements);
             }
         } else if (LIMIT_FOR_ALL_CLEAR == count(measurements, SensorMeasurement::isBelowThreshold)) {
-            alertRepository.getLatestOngoing(uuid).ifPresent(ongoingAlert -> {
-                endAlarm(uuid, ongoingAlert, measurements.stream().findFirst().orElseThrow());
-            });
+            alertRepository.getLatestOngoing(uuid).ifPresent(
+                            ongoingAlert -> endAlarm(
+                                    uuid,
+                                    ongoingAlert,
+                                    measurements.stream().findFirst().orElseThrow()
+                            )
+                    );
         }
     }
 

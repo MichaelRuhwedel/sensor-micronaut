@@ -1,11 +1,6 @@
 package com.mruhwedel.domain
 
-import com.mruhwedel.SensorAPI
 import com.mruhwedel.application.InfluxDbFactory.DatabaseConfig
-import io.micronaut.http.HttpResponse
-import io.micronaut.http.client.HttpClient
-import io.micronaut.http.client.annotation.Client
-import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import org.influxdb.InfluxDB
 import org.influxdb.dto.Query
@@ -14,21 +9,15 @@ import spock.lang.Specification
 import javax.inject.Inject
 import java.time.Duration
 
-import static com.mruhwedel.domain.SensorTestData.ANY_UUID
-import static com.mruhwedel.domain.SensorTestData.ANY_UUID
-import static io.micronaut.core.type.Argument.listOf
-import static io.micronaut.http.HttpRequest.GET
-import static io.micronaut.http.HttpRequest.POST
-import static io.micronaut.http.HttpStatus.NOT_FOUND
-import static java.util.stream.Collectors.toList
+import static com.mruhwedel.domain.SensorStatus.*
 import static com.mruhwedel.domain.SensorTestData.*
+import static java.util.stream.Collectors.toList
 
 @MicronautTest(environments = ['functional-test'])
 class SensorAPIFunctionalSpec extends Specification {
 
     @Inject
-    @Client("/api/v1/sensors/")
-    HttpClient client
+    SensorApiClient client
 
     @Inject
     InfluxDB influxDB
@@ -43,12 +32,8 @@ class SensorAPIFunctionalSpec extends Specification {
 
     // Status & Collecting sensor measurements
     def '404-Not Found: when nothing is recorded'() {
-        when:
-        client.toBlocking().exchange(ANY_UUID)
-
-        then:
-        def e = thrown HttpClientResponseException
-        e.status == NOT_FOUND
+        expect:
+        !client.status(ANY_UUID)
     }
 
     def 'OK: after a measurement below threshold is recorded'() {
@@ -56,7 +41,7 @@ class SensorAPIFunctionalSpec extends Specification {
         collectMeasurement(createBelowThreshold())
 
         then:
-        status == 'OK'
+        status == OK
     }
 
     def 'WARN: after a measurement above is recorded'() {
@@ -64,7 +49,7 @@ class SensorAPIFunctionalSpec extends Specification {
         collectMeasurement(createAboveThreshold())
 
         then:
-        status == 'WARN'
+        status == WARN
     }
 
     def 'OK: the sensors do not interfere'() {
@@ -73,8 +58,8 @@ class SensorAPIFunctionalSpec extends Specification {
         collectMeasurement('b', createBelowThreshold())
 
         then:
-        getStatus('a') == 'WARN'
-        getStatus('b') == 'OK'
+        getStatus('a') == WARN
+        getStatus('b') == OK
     }
 
     def 'WARN: after two above threshold'() {
@@ -83,7 +68,7 @@ class SensorAPIFunctionalSpec extends Specification {
         collectMeasurement(createAboveThreshold(NOW.plusMinutes(1)))
 
         then:
-        status == 'WARN'
+        status == WARN
     }
 
     def 'ALERT: after three above threshold'() {
@@ -93,7 +78,7 @@ class SensorAPIFunctionalSpec extends Specification {
                 .forEach(this::collectMeasurement)
 
         then:
-        status == 'ALERT'
+        status == ALERT
     }
 
     def 'ALERT: after three above threshold & one below'() {
@@ -106,7 +91,7 @@ class SensorAPIFunctionalSpec extends Specification {
         collectMeasurement(createBelowThreshold(NOW.plusMinutes(3)))
 
         then:
-        status == 'ALERT'
+        status == ALERT
     }
 
     def 'ALERT: after three above threshold & two below'() {
@@ -120,7 +105,7 @@ class SensorAPIFunctionalSpec extends Specification {
         collectMeasurement(createBelowThreshold(NOW.plusMinutes(4)))
 
         then:
-        status == 'ALERT'
+        status == ALERT
     }
 
     def 'OK: after three above threshold & three below'() {
@@ -135,24 +120,18 @@ class SensorAPIFunctionalSpec extends Specification {
         collectMeasurement(createBelowThreshold(NOW.plusMinutes(5)))
 
         then:
-        status == 'OK'
+        status == OK
     }
     //END: Status & Collecting sensor measurements
 
     // Sensor Metrics
     def 'Metrics: 404-Not Found: when nothing is recorded'() {
-        when:
-        readMetrics(ANY_UUID)
-
-        then:
-        def e = thrown HttpClientResponseException
-        e.status == NOT_FOUND
+        expect:
+        readMetrics(ANY_UUID) == null
     }
 
     private SensorMetrics readMetrics(uuid) {
-        client.toBlocking()
-                .exchange("$uuid/metrics", SensorMetrics)
-                .body()
+        client.metrics(uuid)
     }
 
     def 'Metrics: Will return the maximum & average of the last 30 days'() {
@@ -210,9 +189,7 @@ class SensorAPIFunctionalSpec extends Specification {
     }
 
     private List<Alert> getAlerts(id) {
-        client.toBlocking()
-                .exchange(GET("$id/alerts"), listOf(Alert))
-                .body()
+        client.alerts(id)
     }
 
     private static List<SensorMeasurement> generateRandomMeasurementsForA30DayWindow() {
@@ -234,15 +211,12 @@ class SensorAPIFunctionalSpec extends Specification {
                 .collect(toList())
     }
 
-    private HttpResponse<Object> collectMeasurement(id = ANY_UUID, SensorMeasurement measurements) {
-        client.toBlocking().exchange(POST("$id/measurements", measurements))
+    private void collectMeasurement(id = ANY_UUID, SensorMeasurement measurements) {
+        client.measurements(id, measurements)
     }
 
-    String getStatus(String id = ANY_UUID) {
-        client.toBlocking()
-                .exchange(id, SensorAPI.StatusDto)
-                .body()
-                .status
+    SensorStatus getStatus(String id = ANY_UUID) {
+        client.status(id).status
     }
 
     private void wipeDatabase() {
@@ -255,5 +229,4 @@ class SensorAPIFunctionalSpec extends Specification {
                 )
         )
     }
-
 }

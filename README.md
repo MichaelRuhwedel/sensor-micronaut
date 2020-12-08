@@ -27,6 +27,15 @@ please start influxDB with a command similar to what the [influxDbStart Task](bu
 The functional- and unit tests aren't yet separated. The functional tests require a running InfluxDb.
 The test task takes care of firing it up Same caveat: It'll work on linux - maybe MacOS.
 
+### Deploying
+```bash
+  ./gradle dockerBuildNative
+  # will give you an image with a native executable that you may run/push
+  docker run sensors:latest  
+```
+
 ## Ideas for future development
 * [Go Serverless](https://docs.micronaut.io/latest/guide/index.html#serverlessFunctions)
-* [Use a native image on Graalvm](https://docs.micronaut.io/latest/guide/index.html#graalServices)
+* [Caching](https://docs.micronaut.io/latest/guide/index.html#caching)
+* [Offload blocking IO from event loop](https://docs.micronaut.io/latest/guide/index.html#reactiveServer)
+

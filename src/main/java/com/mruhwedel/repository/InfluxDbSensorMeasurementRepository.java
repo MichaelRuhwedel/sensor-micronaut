@@ -22,20 +22,10 @@ import static org.influxdb.dto.BoundParameterQuery.QueryBuilder.newQuery;
 @Slf4j
 @Singleton
 @RequiredArgsConstructor
-        // if there's only one, it'll be used for injection
 class InfluxDbSensorMeasurementRepository implements SensorMeasurementRepository {
 
     public static final int LIMIT_PREVIOUS = 2;
-
-    @SuppressWarnings("unused") // @injected
     private final InfluxDBMapper influxDB;
-
-    private static SensorMeasurement measurementToDomain(MeasurementMeasurement measurement) {
-        return new SensorMeasurement(
-                measurement.getCo2Level(),
-                ZonedDateTime.ofInstant(measurement.getTime(), ZoneId.of("UTC"))
-        );
-    }
 
     @Override
     public Optional<SensorMeasurement> fetchCurrent(@NonNull String uuid) {
@@ -95,5 +85,12 @@ class InfluxDbSensorMeasurementRepository implements SensorMeasurementRepository
                         it.getMax(),
                         it.getMean())
                 );
+    }
+
+    private static SensorMeasurement measurementToDomain(MeasurementMeasurement measurement) {
+        return new SensorMeasurement(
+                measurement.getCo2Level(),
+                ZonedDateTime.ofInstant(measurement.getTime(), ZoneId.of("UTC"))
+        );
     }
 }

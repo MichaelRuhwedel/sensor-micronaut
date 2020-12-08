@@ -33,7 +33,7 @@ public class Alert {
     private ZonedDateTime startTime;
 
     /**
-     * When the alarm started ended, the timestamp of the 3rd measurement below threshold
+     * When the alarm ended, the timestamp of the 3rd OK
      */
     private ZonedDateTime endTime;
 

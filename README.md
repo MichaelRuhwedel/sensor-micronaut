@@ -1,6 +1,7 @@
 ## CO2 Sensor Service
 A Service that will collect co2 data in an InfluxDb. You'll find it's API in `SensorAPI`.
 The configuration is stored in `application.yml` and `application-{env}.yml`
+.The app will listen on http://localhost:8080
 
 ## Development Setup
 ### Requirements
@@ -27,11 +28,18 @@ please start influxDB with a command similar to what the [influxDbStart Task](bu
 The functional- and unit tests aren't yet separated. The functional tests require a running InfluxDb.
 The test task takes care of firing it up Same caveat: It'll work on linux - maybe MacOS.
 
-### Deploying
+### Deploying / Running
 ```bash
   ./gradle dockerBuildNative
   # will give you an image with a native executable that you may run/push
   docker run sensors:latest  
+```
+
+```bash
+  # test and buld a fat jar
+  ./gradle build 
+  # run it
+  java -jar build/libs/sensor-0.1-all.jar
 ```
 
 ## Ideas for future development

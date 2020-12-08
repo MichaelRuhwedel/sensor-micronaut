@@ -23,7 +23,7 @@ import static org.influxdb.dto.BoundParameterQuery.QueryBuilder.newQuery;
 @RequiredArgsConstructor
 class InfluxDbSensorMeasurementRepository implements SensorMeasurementRepository {
 
-    public static final int LIMIT_PREVIOUS = 2;
+    public static final int LIMIT_PREVIOUS = 3;
     private final InfluxDBMapper influxDB;
 
     @Override
@@ -47,11 +47,11 @@ class InfluxDbSensorMeasurementRepository implements SensorMeasurementRepository
 
     @Override
     public @NonNull List<SensorMeasurement> fetchLastThreeMeasurements(@NonNull String uuid) {
-        List<SensorMeasurement> results = influxDB.query(createQuery(uuid, 3), MeasurementMeasurement.class)
+        List<SensorMeasurement> results = influxDB.query(createQuery(uuid, LIMIT_PREVIOUS), MeasurementMeasurement.class)
                 .stream()
                 .map(InfluxDbSensorMeasurementRepository::measurementToDomain)
                 .collect(Collectors.toList());
-        log.info("{}: {} of up to {} measurements in repository",
+        log.debug("{}: {} of up to {} measurements in repository",
                 uuid, results.size(), LIMIT_PREVIOUS);
         return results;
     }
@@ -78,7 +78,7 @@ class InfluxDbSensorMeasurementRepository implements SensorMeasurementRepository
         )
                 .bind("uuid", uuid)
                 .create();
-        log.info("{}", query.getCommand());
+        log.debug("{}", query.getCommand());
 
         return influxDB.query(query, MetricsMeasurement.class).stream()
                 .findFirst()

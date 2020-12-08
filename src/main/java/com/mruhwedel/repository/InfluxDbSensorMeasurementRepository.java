@@ -37,10 +37,10 @@ class InfluxDbSensorMeasurementRepository implements SensorMeasurementRepository
     @NotNull
     private Query createQuery(String uuid, int limit) {
         return newQuery(
-                "select * from co2_ppa " +
-                        "where uuid=$uuid " +
-                        "order by time desc " +
-                        "limit $limit")
+                "SELECT * FROM co2_ppa " +
+                        "WHERE uuid=$uuid " +
+                        "ORDER BY time DESC " +
+                        "LIMIT $limit")
                 .bind("uuid", uuid)
                 .bind("limit", limit)
                 .create();

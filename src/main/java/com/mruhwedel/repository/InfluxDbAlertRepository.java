@@ -20,12 +20,16 @@ import static org.influxdb.dto.BoundParameterQuery.QueryBuilder.newQuery;
 @Singleton
 @RequiredArgsConstructor
 class InfluxDbAlertRepository implements AlertRepository {
+    public static final ZoneId DB_ZONE = ZoneId.of("UTC");
+    public static final long UNSET_END_TIME = -1L;
     private final InfluxDBMapper influxDBMapper;
 
     private static Alert measurementToDomain(AlertMeasurement a) {
         return new Alert(
-                a.getStartTime().atZone(ZoneId.of("UTC")),
-                a.getEndTime() == -1 ? null : Instant.ofEpochSecond(a.getEndTime()).atZone(ZoneId.of("UTC")),
+                a.getStartTime().atZone(DB_ZONE),
+                a.getEndTime() == UNSET_END_TIME ?
+                        null :
+                        Instant.ofEpochSecond(a.getEndTime()).atZone(DB_ZONE),
                 a.getMeasurement1(),
                 a.getMeasurement2(),
                 a.getMeasurement3()
@@ -45,10 +49,12 @@ class InfluxDbAlertRepository implements AlertRepository {
         return newQuery(
                 "SELECT * FROM alert_co2 " +
                         " WHERE uuid = $uuid " +
-                        " AND end_time = -1 " +
-                        " ORDER BY time desc " +
+                        " AND end_time = $endTime " +
+                        " ORDER BY time DESC " +
                         " LIMIT 1"
-        ).bind("uuid", uuid)
+        )
+                .bind("endTime", UNSET_END_TIME)
+                .bind("uuid", uuid)
                 .create();
     }
 
@@ -61,7 +67,9 @@ class InfluxDbAlertRepository implements AlertRepository {
     private AlertMeasurement domainToMeasurement(String uuid, Alert alert) {
         return new AlertMeasurement(
                 alert.getStartTime().toInstant(),
-                Optional.ofNullable(alert.getEndTime()).map(et -> et.toInstant().getEpochSecond()).orElse(-1L),
+                Optional.ofNullable(alert.getEndTime())
+                        .map(et -> et.toInstant().getEpochSecond())
+                        .orElse(UNSET_END_TIME),
                 alert.getMeasurement1(),
                 alert.getMeasurement2(),
                 alert.getMeasurement3(),
@@ -74,7 +82,7 @@ class InfluxDbAlertRepository implements AlertRepository {
         Query queryAll = newQuery(
                 "SELECT * FROM alert_co2 " +
                         " WHERE uuid = $uuid " +
-                        " ORDER BY time desc "
+                        " ORDER BY time DESC "
         )
                 .bind("uuid", uuid)
                 .create();

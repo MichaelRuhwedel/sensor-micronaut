@@ -192,6 +192,26 @@ class SensorAPIFunctionalSpec extends Specification {
         !getAlerts(someOtherId)
     }
 
+    def 'Alerts: We can record multiple alerts and they\'ll be returned'() {
+        given:
+        def measurementsAboveThreshold = (0..2)
+                .collect { createAboveThreshold(NOW.plusMinutes(it)) }
+
+        def measurementsBelow = (3..5)
+                .collect { createBelowThreshold(NOW.plusMinutes(it)) }
+
+        def measurementsAboveThreshold2 = (6..8)
+                .collect { createAboveThreshold(NOW.plusMinutes(it)) }
+
+
+        when:
+        [measurementsAboveThreshold, measurementsBelow, measurementsAboveThreshold2].flatten().forEach(this::collectMeasurement)
+        def actualAlerts = getAlerts(ANY_UUID)
+
+        then:
+        actualAlerts.size() == 2
+    }
+
     private List<Alert> getAlerts(id) {
         client.alerts(id)
     }

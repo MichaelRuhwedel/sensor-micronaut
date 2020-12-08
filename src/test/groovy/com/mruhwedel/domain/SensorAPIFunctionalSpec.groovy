@@ -25,7 +25,7 @@ class SensorAPIFunctionalSpec extends Specification {
     @Inject
     DatabaseConfig databaseConfig
 
-    @SuppressWarnings('unused')
+    @SuppressWarnings('unused')// used by Spock
     def setup() {
         wipeDatabase()
     }
@@ -38,7 +38,7 @@ class SensorAPIFunctionalSpec extends Specification {
 
     def 'OK: after a measurement below threshold is recorded'() {
         when:
-        collectMeasurement(createBelowThreshold())
+        collectMeasurement(MEASUREMENT_BELOW_THRESHOLD)
 
         then:
         status == OK
@@ -46,20 +46,23 @@ class SensorAPIFunctionalSpec extends Specification {
 
     def 'WARN: after a measurement above is recorded'() {
         when:
-        collectMeasurement(createAboveThreshold())
+        collectMeasurement(MEASUREMENT_ABOVE_THRESHOLD)
 
         then:
         status == WARN
     }
 
-    def 'OK: the sensors do not interfere'() {
+    def 'WARN/OK: the sensors do not interfere'() {
+        given:
+        def anotherUUID = UUID.randomUUID() as String
+
         when:
-        collectMeasurement('a', createAboveThreshold())
-        collectMeasurement('b', createBelowThreshold())
+        collectMeasurement(ANY_UUID, MEASUREMENT_ABOVE_THRESHOLD)
+        collectMeasurement(anotherUUID, MEASUREMENT_BELOW_THRESHOLD)
 
         then:
-        getStatus('a') == WARN
-        getStatus('b') == OK
+        getStatus(ANY_UUID) == WARN
+        getStatus(anotherUUID) == OK
     }
 
     def 'WARN: after two above threshold'() {
@@ -177,6 +180,7 @@ class SensorAPIFunctionalSpec extends Specification {
                 measurementsAboveThreshold[2].co2,
         )
 
+        def someOtherId = UUID.randomUUID() as String
         when:
         measurementsAboveThreshold.forEach(this::collectMeasurement)
         def actualAlerts = getAlerts(ANY_UUID)
@@ -184,8 +188,8 @@ class SensorAPIFunctionalSpec extends Specification {
         then:
         actualAlerts == [expected]
 
-        and: 'alerts won\'t interfere'
-        getAlerts('some-other-id') == []
+        and: "alerts won't interfere"
+        !getAlerts(someOtherId)
     }
 
     private List<Alert> getAlerts(id) {
@@ -215,7 +219,7 @@ class SensorAPIFunctionalSpec extends Specification {
         client.measurements(id, measurements)
     }
 
-    SensorStatus getStatus(String id = ANY_UUID) {
+    SensorStatus getStatus(id = ANY_UUID) {
         client.status(id).status
     }
 

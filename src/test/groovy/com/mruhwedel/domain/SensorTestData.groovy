@@ -10,7 +10,7 @@ import static java.time.ZonedDateTime.now
 import static java.time.temporal.ChronoUnit.SECONDS
 
 abstract class SensorTestData {
-    static ANY_UUID = 'any-uuid'
+    static final String ANY_UUID = UUID.randomUUID() as String
 
     private static final int CO_2_THRESHOLD = 2000
 
@@ -19,12 +19,12 @@ abstract class SensorTestData {
 
     static final ZonedDateTime NOW = now(ZoneId.of("UTC")).truncatedTo(SECONDS)
 
-    static MEASUREMENT_BELOW_THRESHOLD = createBelowThreshold()
-    static MEASUREMENT_AT_THRESHOLD = createMeasurement(CO_2_THRESHOLD)
-    static MEASUREMENT_ABOVE_THRESHOLD = createAboveThreshold()
+    static final MEASUREMENT_BELOW_THRESHOLD = createBelowThreshold()
+    static final MEASUREMENT_AT_THRESHOLD = createMeasurement(CO_2_THRESHOLD)
+    static final MEASUREMENT_ABOVE_THRESHOLD = createAboveThreshold()
 
-    static ALERT_ONGOING = createAlertOngoing()
-    static ALERT_ENDED = createAlertEnded()
+    static final ALERT_ONGOING = createAlertOngoing()
+    static final ALERT_ENDED = createAlertEnded()
 
     static createBelowThreshold(ZonedDateTime time = NOW) {
         createMeasurement(CO_2_BELOW_THRESHOLD, time)

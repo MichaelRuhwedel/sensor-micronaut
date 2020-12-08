@@ -38,9 +38,9 @@ class InfluxDbSensorMeasurementRepository implements SensorMeasurementRepository
     private Query createQuery(String uuid, int limit) {
         return newQuery(
                 "SELECT * FROM co2_ppa " +
-                        "WHERE uuid=$uuid " +
-                        "ORDER BY time DESC " +
-                        "LIMIT $limit")
+                        " WHERE uuid=$uuid " +
+                        " ORDER BY time DESC " +
+                        " LIMIT $limit")
                 .bind("uuid", uuid)
                 .bind("limit", limit)
                 .create();
@@ -73,7 +73,9 @@ class InfluxDbSensorMeasurementRepository implements SensorMeasurementRepository
         Query query = newQuery(
                 "SELECT ROUND(MEAN(\"co2_level\")) as mean, MAX(\"co2_level\") " +
                         "FROM co2_ppa " +
-                        "WHERE uuid = $uuid AND now() - 30d < time"
+                        "WHERE " +
+                        "  uuid = $uuid AND " +
+                        "  now() - 30d < time"
         )
                 .bind("uuid", uuid)
                 .create();

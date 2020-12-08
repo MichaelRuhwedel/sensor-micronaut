@@ -20,8 +20,8 @@ import static org.influxdb.dto.BoundParameterQuery.QueryBuilder.newQuery;
 @Singleton
 @RequiredArgsConstructor
 class InfluxDbAlertRepository implements AlertRepository {
-    public static final ZoneId DB_ZONE = ZoneId.of("UTC");
-    public static final long UNSET_END_TIME = -1L;
+    private static final ZoneId DB_ZONE = ZoneId.of("UTC");
+    private static final long UNSET_END_TIME = -1L;
     private final InfluxDBMapper influxDBMapper;
 
     private static Alert measurementToDomain(AlertMeasurement a) {
@@ -48,8 +48,9 @@ class InfluxDbAlertRepository implements AlertRepository {
     private BoundParameterQuery queryForLatestOngoing(String uuid) {
         return newQuery(
                 "SELECT * FROM alert_co2 " +
-                        " WHERE uuid = $uuid " +
-                        " AND end_time = $endTime " +
+                        " WHERE " +
+                        "   uuid = $uuid AND" +
+                        "   end_time = $endTime " +
                         " ORDER BY time DESC " +
                         " LIMIT 1"
         )

@@ -29,17 +29,20 @@ The functional- and unit tests aren't yet separated. The functional tests requir
 The test task takes care of firing it up Same caveat: It'll work on linux - maybe MacOS.
 
 ### Deploying / Running
+#### Native Executable in a Docker Image 
 ```bash
-  ./gradle dockerBuildNative
-  # will give you an image with a native executable that you may run/push
-  docker run sensors:latest  
+  # build a docker image that you may run/push
+  ./gradle dockerBuildNative  
+  docker run sensor
+  # start time ~100ms  
 ```
-
+#### Traditional Fat Jar
 ```bash
-  # test and buld a fat jar
+  # test and build a fat jar
   ./gradle build 
   # run it
   java -jar build/libs/sensor-0.1-all.jar
+  # start time ~1000ms
 ```
 
 ## Ideas for future development

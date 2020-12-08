@@ -1,7 +1,7 @@
 package com.mruhwedel.domain
 
 import com.mruhwedel.repository.AlertRepository
-import com.mruhwedel.repository.SensorMeasurementRepository
+import com.mruhwedel.repository.SensorRepository
 import spock.lang.Specification
 
 import static com.mruhwedel.domain.SensorStatus.*
@@ -11,7 +11,7 @@ class SensorServiceSpec extends Specification {
 
     public static final int ALERT_AND_ALL_CLEAR_LIMIT = 3
     def service = new SensorService(
-            Mock(SensorMeasurementRepository),
+            Mock(SensorRepository),
             Mock(AlertRepository),
     )
 
@@ -21,7 +21,7 @@ class SensorServiceSpec extends Specification {
 
         then:
         1 * service.alertRepository.getLatestOngoing(ANY_UUID) >> Optional.empty()
-        1 * service.sensorMeasurementRepository.fetchCurrent(ANY_UUID) >> Optional.of(MEASUREMENT_BELOW_THRESHOLD)
+        1 * service.sensorRepository.fetchCurrent(ANY_UUID) >> Optional.of(MEASUREMENT_BELOW_THRESHOLD)
 
         status.map(OK::equals).orElse(false)
     }
@@ -32,7 +32,7 @@ class SensorServiceSpec extends Specification {
 
         then:
         1 * service.alertRepository.getLatestOngoing(ANY_UUID) >> Optional.empty()
-        1 * service.sensorMeasurementRepository.fetchCurrent(ANY_UUID) >> Optional.of(MEASUREMENT_ABOVE_THRESHOLD)
+        1 * service.sensorRepository.fetchCurrent(ANY_UUID) >> Optional.of(MEASUREMENT_ABOVE_THRESHOLD)
 
         status.map(WARN::equals).orElse(false)
     }
@@ -43,7 +43,7 @@ class SensorServiceSpec extends Specification {
 
         then:
         1 * service.alertRepository.getLatestOngoing(ANY_UUID) >> Optional.of(ALERT_ONGOING)
-        0 * service.sensorMeasurementRepository.fetchCurrent(_)
+        0 * service.sensorRepository.fetchCurrent(_)
 
         status.map(ALERT::equals).orElse(false)
     }
@@ -56,8 +56,8 @@ class SensorServiceSpec extends Specification {
         service.recordAndUpdateAlert(ANY_UUID, currentMeasurement)
 
         then:
-        1 * service.sensorMeasurementRepository.write(ANY_UUID, currentMeasurement)
-        _ * service.sensorMeasurementRepository.fetchLastThreeMeasurements(_) >> []
+        1 * service.sensorRepository.write(ANY_UUID, currentMeasurement)
+        _ * service.sensorRepository.fetchLastThreeMeasurements(_) >> []
     }
 
     def "recordAndUpdateAlert() NO Alert: No alert is recorded when the alert limit is not crossed"(
@@ -69,7 +69,7 @@ class SensorServiceSpec extends Specification {
         service.recordAndUpdateAlert(ANY_UUID, MEASUREMENT_BELOW_THRESHOLD)
 
         then:
-        1 * service.sensorMeasurementRepository.fetchLastThreeMeasurements(ANY_UUID) >> previousThree
+        1 * service.sensorRepository.fetchLastThreeMeasurements(ANY_UUID) >> previousThree
         _ * service.alertRepository.getLatestOngoing(ANY_UUID) >> Optional.empty()
         0 * service.alertRepository.write(ANY_UUID, _)
 
@@ -108,7 +108,7 @@ class SensorServiceSpec extends Specification {
         service.recordAndUpdateAlert(ANY_UUID, Stub(SensorMeasurement)) // we can stub the measurement, we only care about what's recorded
 
         then:
-        1 * service.sensorMeasurementRepository.fetchLastThreeMeasurements(ANY_UUID) >> previousThree
+        1 * service.sensorRepository.fetchLastThreeMeasurements(ANY_UUID) >> previousThree
         _ * service.alertRepository.getLatestOngoing(ANY_UUID) >> Optional.empty()
         1 * service.alertRepository.write(ANY_UUID, newOngoingAlert) //
     }
@@ -119,7 +119,7 @@ class SensorServiceSpec extends Specification {
         service.recordAndUpdateAlert(ANY_UUID, Stub(SensorMeasurement)) // we can stub the measurement, we only care about what's recorded
 
         then:
-        1 * service.sensorMeasurementRepository.fetchLastThreeMeasurements(ANY_UUID) >> previousThree
+        1 * service.sensorRepository.fetchLastThreeMeasurements(ANY_UUID) >> previousThree
         _ * service.alertRepository.getLatestOngoing(ANY_UUID) >> Optional.of(Stub(Alert))
         0 * service.alertRepository.write(ANY_UUID, _) //
 
@@ -156,7 +156,7 @@ class SensorServiceSpec extends Specification {
         service.recordAndUpdateAlert(ANY_UUID, Stub(SensorMeasurement)) // we can stub the measurement, we only care about what's recorded
 
         then:
-        1 * service.sensorMeasurementRepository.fetchLastThreeMeasurements(ANY_UUID) >> [MEASUREMENT_BELOW_THRESHOLD] * ALERT_AND_ALL_CLEAR_LIMIT
+        1 * service.sensorRepository.fetchLastThreeMeasurements(ANY_UUID) >> [MEASUREMENT_BELOW_THRESHOLD] * ALERT_AND_ALL_CLEAR_LIMIT
         _ * service.alertRepository.getLatestOngoing(ANY_UUID) >> Optional.of(ongoingAlert)
         1 * service.alertRepository.write(ANY_UUID, {
             it == ongoingAlert

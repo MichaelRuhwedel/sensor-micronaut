@@ -1,7 +1,7 @@
 package com.mruhwedel.domain;
 
 import com.mruhwedel.repository.AlertRepository;
-import com.mruhwedel.repository.SensorMeasurementRepository;
+import com.mruhwedel.repository.SensorRepository;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -23,14 +23,14 @@ import static lombok.AccessLevel.PACKAGE;
 @RequiredArgsConstructor
 public class SensorService {
 
-    private final SensorMeasurementRepository sensorMeasurementRepository;
+    private final SensorRepository sensorRepository;
     private final AlertRepository alertRepository;
 
     @NonNull
     public Optional<SensorStatus> readStatus(@NonNull String uuid) {
         return alertRepository.getLatestOngoing(uuid)
                 .map(ongoingAlert -> ALERT) // an ongoing alert is returned as such
-                .or(() -> sensorMeasurementRepository.fetchCurrent(uuid)
+                .or(() -> sensorRepository.fetchCurrent(uuid)
                         .map(current -> current.isAboveThreshold() ?
                                 WARN : OK
                         )
@@ -39,14 +39,14 @@ public class SensorService {
 
     @NonNull
     public Optional<SensorMetrics> readMetrics(@NonNull String uuid) {
-        Optional<SensorMetrics> metrics = sensorMeasurementRepository.readMetrics(uuid);
+        Optional<SensorMetrics> metrics = sensorRepository.readMetrics(uuid);
         log.info("{}:  {}", uuid, metrics.map(Object::toString).orElse("UNKNOWN"));
         return metrics;
     }
 
     public void recordAndUpdateAlert(@NonNull String uuid, @NonNull SensorMeasurement measurement) {
-        sensorMeasurementRepository.write(uuid, measurement);
-        List<SensorMeasurement> measurements = sensorMeasurementRepository.fetchLastThreeMeasurements(uuid);
+        sensorRepository.write(uuid, measurement);
+        List<SensorMeasurement> measurements = sensorRepository.fetchLastThreeMeasurements(uuid);
 
         if (LIMIT_FOR_ALARM == count(measurements, SensorMeasurement::isAboveThreshold)) {
             if (alertRepository.getLatestOngoing(uuid).isEmpty()) {

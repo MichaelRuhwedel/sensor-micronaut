@@ -51,8 +51,4 @@ public class Alert {
      * the ultimate measurement that triggered the alarm
      */
     private int measurement3;
-
-    public boolean isOngoing() {
-        return endTime == null;
-    }
 }

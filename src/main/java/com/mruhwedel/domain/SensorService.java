@@ -28,9 +28,7 @@ public class SensorService {
 
     @NonNull
     public Optional<SensorStatus> readStatus(@NonNull String uuid) {
-        return alertRepository
-                .getLatestOngoing(uuid)
-                .filter(Alert::isOngoing)
+        return alertRepository.getLatestOngoing(uuid)
                 .map(ongoingAlert -> ALERT) // an ongoing alert is returned as such
                 .or(() -> sensorMeasurementRepository.fetchCurrent(uuid)
                         .map(current -> current.isAboveThreshold() ?

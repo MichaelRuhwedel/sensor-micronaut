@@ -67,11 +67,11 @@ public class SensorService {
 
     private void endAlarm(String uuid, Alert ongoingAlert, SensorMeasurement sensorMeasurement) {
         ongoingAlert.setEndTime(sensorMeasurement.getTime());
-        alertRepository.save(uuid, ongoingAlert);
+        alertRepository.write(uuid, ongoingAlert);
     }
 
     private void createNewAlarm(String uuid, List<SensorMeasurement> measurements) {
-        alertRepository.save(
+        alertRepository.write(
                 uuid,
                 new Alert(
                         measurements.get(0).getTime(),

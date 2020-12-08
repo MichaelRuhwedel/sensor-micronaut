@@ -13,9 +13,9 @@ public interface AlertRepository {
     Optional<Alert> getLatestOngoing(@NonNull String uuid);
 
     /**
-     * Writes an Alert, alerts with the same start time
+     * Persists an Alert, alerts with the same start time
      */
-    void save(@NonNull String uuid, Alert alert);
+    void write(@NonNull String uuid, Alert alert);
 
     @NonNull
     List<Alert> getAll(@NonNull String uuid);

@@ -60,7 +60,7 @@ class InfluxDbAlertRepository implements AlertRepository {
     }
 
     @Override
-    public void save(String uuid, Alert alert) {
+    public void write(String uuid, Alert alert) {
         influxDBMapper.save(domainToMeasurement(uuid, alert));
     }
 

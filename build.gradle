@@ -24,7 +24,7 @@ micronaut {
 }
 
 ext {
-    VERSION_LOMBOK = '1.18.16'
+    VERSION_LOMBOK = '1.18.20'
     VERSION_GROOVY = '3.0.7'
 }
 

@@ -3,7 +3,7 @@ import jdk.internal.net.http.HttpConnection
 plugins {
     id("groovy")
     id("com.github.johnrengelman.shadow") version "6.1.0"
-    id("io.micronaut.application") version "1.2.0"
+    id("io.micronaut.application") version "1.4.3"
 }
 
 version = "0.1"

@@ -25,7 +25,7 @@ micronaut {
 
 ext {
     VERSION_LOMBOK = '1.18.16'
-    VERSION_GROOVY = '3.0.7'
+    VERSION_GROOVY = '3.0.8'
 }
 
 dependencies {
